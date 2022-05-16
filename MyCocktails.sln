@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32413.511
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyCocktailsApp", "MyCocktailsApp\MyCocktailsApp.csproj", "{2104D919-DB3D-4329-980C-9EA4C6674326}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2104D919-DB3D-4329-980C-9EA4C6674326}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2104D919-DB3D-4329-980C-9EA4C6674326}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2104D919-DB3D-4329-980C-9EA4C6674326}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2104D919-DB3D-4329-980C-9EA4C6674326}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2EBF552F-61E2-463A-BE0A-6B22CD0FEB54}
+	EndGlobalSection
+EndGlobal
