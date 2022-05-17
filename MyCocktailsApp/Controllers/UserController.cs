@@ -52,7 +52,7 @@
             };
 
             var result = new IdentityResult();
-
+            
             try
             {
                 result = await userManager.CreateAsync(appUser, user.Password);

@@ -4,6 +4,7 @@
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
     using MyCocktailsApi.Data.Models;
+    using MyCocktailsApi.Infrastructure;
     using MyCocktailsApi.Models;
     using MyCocktailsApi.Services;
     using System;
@@ -90,18 +91,24 @@
             return Ok(model);
         }
 
-        //[HttpPost("Like/{id}")]
-        //public async Task<IActionResult> Like(string id)
-        //{
-        //    var cocktail = await cocktailService.GetByIdAsync(id);
+        [HttpPost("Like/{id}")]
+        public async Task<IActionResult> Like(string id)
+        {
+            var cocktail = await cocktailService.GetByIdAsync(id);
 
-        //    if (cocktail == null)
-        //    {
-        //        return NotFound();
-        //    }
+            if (cocktail == null)
+            {
+                return NotFound();
+            }
+
+            var userId = this.User.GetId();
+
+            await cocktailService.UpdateLikes(cocktail, userId);
 
 
-        //}
+            return Ok("Likes were updated");
+
+        }
 
 
         [HttpPut("{id:length(24)}")]

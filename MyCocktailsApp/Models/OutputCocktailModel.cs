@@ -4,6 +4,8 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Runtime.Serialization;
+    using System.Text.Json.Serialization;
     using System.Threading.Tasks;
 
     public class OutputCocktailModel
@@ -17,6 +19,8 @@
 
         public int Likes { get; set; }
 
+        [IgnoreDataMember]
+        public IList<string> UsersLike { get; set; } = new List<string>();
         public string Glass { get; set; }
 
         public string? PictureUrl { get; set; }

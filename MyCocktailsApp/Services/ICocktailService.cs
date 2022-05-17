@@ -14,6 +14,6 @@
         Task<Cocktail> CreateAsync(InputCocktailModel cocktail);
         Task UpdateAsync(UpdateCocktailModel currentCocktail, InputCocktailModel updatedCocktail);
         Task RemoveAsync(string id);
-        //Task<OutputCocktailModel> Like(string id);
+        Task UpdateLikes(OutputCocktailModel model, string userId);
     }
 }

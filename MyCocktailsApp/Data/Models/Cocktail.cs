@@ -8,7 +8,7 @@
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
-
+    using System.Runtime.Serialization;
     using static MyCocktailsApi.Data.DataConstants.Cocktail;
 
     [BsonIgnoreExtraElements]
@@ -32,7 +32,18 @@
 
         [Required]
         [Range(0, int.MaxValue)]
-        public int Likes { get; set; }
+
+        [JsonIgnore]
+        public int Likes
+        {
+            get
+            {
+                return UsersLike.Count;
+            }
+        }
+
+        [IgnoreDataMember]
+        public IList<string> UsersLike{ get; set; } = new List<string>();
 
         [Required]
         [EnumDataType(typeof(GlassType))]

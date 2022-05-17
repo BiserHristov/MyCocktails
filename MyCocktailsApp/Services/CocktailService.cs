@@ -86,24 +86,57 @@
             }
         }
 
+        public async Task UpdateLikes(OutputCocktailModel model, string userId)
+        {
+            try
+            {
+                if (model.UsersLike.Contains(userId))
+                {
+                    model.UsersLike.Remove(userId);
+                }
+                else
+                {
+                    model.UsersLike.Add(userId);
+                }
+
+                var dbCocktail = this.mapper.Map<Cocktail>(model);
+                await cocktailsCollection.ReplaceOneAsync(c => c.Id == dbCocktail.Id, dbCocktail);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Failed to update likes!");
+            }
+        }
+
         public async Task RemoveAsync(string id) =>
             await cocktailsCollection.DeleteOneAsync(cocktail => cocktail.Id == id);
 
         private void UpdateCocktail(UpdateCocktailModel dbCocktail, InputCocktailModel updatedCocktail)
         {
-            if (!string.IsNullOrWhiteSpace(updatedCocktail.Name))
+            if (!string.IsNullOrWhiteSpace(updatedCocktail.Name) &&
+                updatedCocktail.Name != dbCocktail.Name)
             {
                 dbCocktail.Name = updatedCocktail.Name;
+            }
+
+            if (!string.IsNullOrWhiteSpace(updatedCocktail.Category) &&
+               updatedCocktail.Category != dbCocktail.Category)
+            {
+                dbCocktail.Category = updatedCocktail.Category;
+            }
+
+            if (!string.IsNullOrWhiteSpace(updatedCocktail.Instructions) &&
+               updatedCocktail.Instructions != dbCocktail.Instructions)
+            {
+                dbCocktail.Instructions = updatedCocktail.Instructions;
             }
 
             if (updatedCocktail.Likes >= 0)
             {
                 dbCocktail.Likes = updatedCocktail.Likes;
             }
-            if (!string.IsNullOrWhiteSpace(updatedCocktail.Category))
-            {
-                dbCocktail.Category = updatedCocktail.Category;
-            }
+
+
 
             dbCocktail.Ingredients.Clear();
 
@@ -117,6 +150,11 @@
 
                 }
             }
+        }
+
+        public Task<OutputCocktailModel> Like(string id)
+        {
+            throw new NotImplementedException();
         }
     }
 }
