@@ -1,13 +1,10 @@
-﻿namespace MyCocktailsApp.Models
+﻿namespace MyCocktailsApi.Models
 {
-    using MyCocktailsApp.Data.Models;
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
-    using System.Linq;
-    using System.Threading.Tasks;
 
-    using static MyCocktailsApp.Data.DataConstants.Cocktail;
+    using static MyCocktailsApi.Data.DataConstants.Cocktail;
 
     public class InputCocktailModel
     {
@@ -30,15 +27,12 @@
         [Required]
         public string Glass { get; set; }
 
-
         [Url]
         public string? PictureUrl { get; set; }
 
         [Required]
-        public IList<Ingredient> Ingredients { get; init; } = new List<Ingredient>();
+        public IList<InputIngredientModel> Ingredients { get; init; } = new List<InputIngredientModel>();
 
-        //[BsonElement("date")]
-        //[BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
         [Required]
         [DataType(DataType.DateTime)]
         public DateTime DateModified { get; set; }

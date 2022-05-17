@@ -1,18 +1,19 @@
-﻿namespace MyCocktailsApp.Services
+﻿namespace MyCocktailsApi.Services
 {
-    using MyCocktailsApp.Data.Models;
-    using MyCocktailsApp.Models;
+    using MyCocktailsApi.Data.Models;
+    using MyCocktailsApi.Models;
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
     public interface ICocktailService
     {
-        Task<List<Cocktail>> GetAllAsync();
-        Task<Cocktail> GetByIdAsync(string id);
-        Task<Cocktail> GetByNameAsync(string name);
-        Task<IEnumerable<Cocktail>> GetByCategoryAsync(string category);
+        Task<IEnumerable<OutputCocktailModel>> GetAllAsync();
+        Task<OutputCocktailModel> GetByIdAsync(string id);
+        Task<OutputCocktailModel> GetByNameAsync(string name);
+        Task<IEnumerable<OutputCocktailModel>> GetByCategoryAsync(string category);
         Task<Cocktail> CreateAsync(InputCocktailModel cocktail);
-        Task UpdateAsync(string id, Cocktail cocktail);
+        Task UpdateAsync(UpdateCocktailModel currentCocktail, InputCocktailModel updatedCocktail);
         Task RemoveAsync(string id);
+        //Task<OutputCocktailModel> Like(string id);
     }
 }

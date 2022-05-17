@@ -1,10 +1,9 @@
-﻿using MyCocktailsApp.Infrastructure;
+﻿using MyCocktailsApi.Infrastructure;
 using System.ComponentModel.DataAnnotations;
-using static MyCocktailsApp.Data.DataConstants.Ingredient;
+using static MyCocktailsApi.Data.DataConstants.Ingredient;
 
-namespace MyCocktailsApp.Data.Models
+namespace MyCocktailsApi.Data.Models
 {
-
     public class Ingredient
     {
         [Required]

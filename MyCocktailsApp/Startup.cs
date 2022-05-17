@@ -1,5 +1,6 @@
-namespace MyCocktailsApp
+namespace MyCocktailsApi
 {
+    using AutoMapper;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;
@@ -7,9 +8,12 @@ namespace MyCocktailsApp
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Options;
     using Microsoft.OpenApi.Models;
-    using MyCocktailsApp.Data;
-    using MyCocktailsApp.Infrastructure;
-    using MyCocktailsApp.Services;
+    using MyCocktailsApi.Data.Models;
+    using MyCocktailsApi.Infrastructure;
+    using MyCocktailsApi.Services;
+    using MyCocktailsApi.Settings;
+    using System;
+    using System.Threading.Tasks;
 
     public class Startup
     {
@@ -20,19 +24,12 @@ namespace MyCocktailsApp
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //services.Configure<PostsDatabaseSettings>()
+            var mongoDbSettings = Configuration.GetSection(nameof(MongoDbConfig)).Get<MongoDbConfig>();
 
-            //services.AddSingleton<IMongoClient, MongoClient>(s =>
-            //{
-            //    var uri = s.GetRequiredService<IConfiguration>()["MongoConnectionString"];
-            //    return new MongoClient(uri);
-            //});
-            //services.AddTransient<IPostDatabaseSettings, PostsDatabaseSettings>();
-            //services.AddTransient<IPostService, PostService>();
-            //services.AddTransient<IMongoClient, MongoClient>();
+            services.AddIdentity<ApplicationUser, ApplicationRole>()
+                .AddMongoDbStores<ApplicationUser, ApplicationRole, Guid>(mongoDbSettings.ConnectionString, mongoDbSettings.AuthDbName);
 
             services.Configure<CocktailDatabaseSettings>(Configuration.GetSection(nameof(CocktailDatabaseSettings)));
 
@@ -41,22 +38,27 @@ namespace MyCocktailsApp
 
             services.AddAutoMapper(typeof(Startup));
 
-            //services.AddScoped<CocktailService>();
             services.AddTransient<ICocktailService, CocktailService>();
 
             services.AddControllers().AddNewtonsoftJson(options => options.UseMemberCasing());
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "MyCocktailsApp", Version = "v1" });
             });
 
-
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IMapper mapper)
         {
-            app.PrepareDatabase();
+            Task
+                .Run(async () =>
+                {
+                    await app.PrepareDatabase(mapper);
+                })
+                .GetAwaiter()
+                .GetResult();
+
 
             app.UseDeveloperExceptionPage();
 
@@ -73,6 +75,8 @@ namespace MyCocktailsApp
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 

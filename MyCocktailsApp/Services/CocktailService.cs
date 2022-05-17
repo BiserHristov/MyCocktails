@@ -1,12 +1,11 @@
-﻿namespace MyCocktailsApp.Services
+﻿namespace MyCocktailsApi.Services
 {
     using AutoMapper;
-    using MongoDB.Bson;
     using MongoDB.Driver;
-    using MyCocktailsApp.Data;
-    using MyCocktailsApp.Data.Models;
-    using MyCocktailsApp.Models;
-    using System;
+    using MongoDB.Driver.Linq;
+    using MyCocktailsApi.Settings;
+    using MyCocktailsApi.Data.Models;
+    using MyCocktailsApi.Models;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
@@ -15,9 +14,6 @@
     {
         private readonly IMongoCollection<Cocktail> cocktailsCollection;
         private readonly IMapper mapper;
-
-        //private readonly IConfiguration configuration;
-
         public CocktailService(ICocktailDatabaseSettings settings, IMapper mapper)
         {
             var client = new MongoClient(settings.ConnectionString);
@@ -25,33 +21,34 @@
 
             cocktailsCollection = database.GetCollection<Cocktail>(settings.CocktailsCollectionName);
             this.mapper = mapper;
-
-            //MongoClient dbClient = new MongoClient(configuration.GetConnectionString("DatabaseConn
-            //);
-            //postCollection = dbClient.GetDatabase("myFirstDatabase").GetCollection<Post>("posts");
-            //var db = mongoClient.GetDatabase(configuration.getdata);
-            //postsCollection = db.GetCollection<Post>(configuration.PostsCollectionName);
-            //this.configuration = configuration;
         }
-        public async Task<List<Cocktail>> GetAllAsync() =>
-            await cocktailsCollection.Find(cocktail => true).ToListAsync();
+        public async Task<IEnumerable<OutputCocktailModel>> GetAllAsync()
+        {
+            var dbCocktails = await cocktailsCollection.Find(cocktail => true).ToListAsync();
+            return this.mapper.Map<IEnumerable<OutputCocktailModel>>(dbCocktails);
+        }
 
+        public async Task<OutputCocktailModel> GetByIdAsync(string id)
+        {
+            var cocktailModel = await cocktailsCollection.Find(cocktail => cocktail.Id == id).FirstOrDefaultAsync();
+            return this.mapper.Map<OutputCocktailModel>(cocktailModel);
+        }
 
-        public async Task<Cocktail> GetByIdAsync(string id) =>
-            await cocktailsCollection.Find(cocktail => cocktail.Id == id).FirstOrDefaultAsync();
-
-        public async Task<Cocktail> GetByNameAsync(string name)
+        public async Task<OutputCocktailModel> GetByNameAsync(string name)
         {
             name = name.ToLower();
-            return await cocktailsCollection.Find(cocktail => cocktail.Name.ToLower() == name).FirstOrDefaultAsync();
+            var cocktailModel = await cocktailsCollection.Find(cocktail => cocktail.Name.ToLower() == name).FirstOrDefaultAsync();
+            return this.mapper.Map<OutputCocktailModel>(cocktailModel);
+
         }
 
-        public async Task<IEnumerable<Cocktail>> GetByCategoryAsync(string category)
+        public async Task<IEnumerable<OutputCocktailModel>> GetByCategoryAsync(string category)
         {
             category = category.ToLower();
-            return await cocktailsCollection.Find(cocktail => cocktail.Category.ToLower() == category).ToListAsync();
-
+            var cocktailModel = await cocktailsCollection.Find(cocktail => cocktail.Category.ToLower() == category).ToListAsync();
+            return this.mapper.Map<IEnumerable<OutputCocktailModel>>(cocktailModel);
         }
+
         public async Task<Cocktail> CreateAsync(InputCocktailModel model)
         {
             var cocktail = this.mapper.Map<Cocktail>(model);
@@ -59,23 +56,17 @@
             return cocktail;
         }
 
-        public async Task UpdateAsync(Cocktail currentCocktail, Cocktail updatedCocktail)
+        public async Task UpdateAsync(UpdateCocktailModel currentCocktail, InputCocktailModel updatedCocktail)
         {
-            
             UpdateCocktail(currentCocktail, updatedCocktail);
 
-            await cocktailsCollection.ReplaceOneAsync(c => c.Id == currentCocktail.Id, updatedCocktail);
+            await cocktailsCollection.ReplaceOneAsync(c => c.Id == currentCocktail.Id, this.mapper.Map<Cocktail>(updatedCocktail));
         }
-
-        //public void Remove(Post postIn) =>
-        //    _postCollection.DeleteOne(post => post.Id == postIn.Id);
 
         public async Task RemoveAsync(string id) =>
             await cocktailsCollection.DeleteOneAsync(cocktail => cocktail.Id == id);
 
-
-
-        private void UpdateCocktail(Cocktail dbCocktail, Cocktail updatedCocktail)
+        private void UpdateCocktail(UpdateCocktailModel dbCocktail, InputCocktailModel updatedCocktail)
         {
             if (!string.IsNullOrWhiteSpace(updatedCocktail.Name))
             {
@@ -91,22 +82,18 @@
                 dbCocktail.Category = updatedCocktail.Category;
             }
 
+            dbCocktail.Ingredients.Clear();
+
             var updatedIngredientsCount = updatedCocktail.Ingredients.Count();
 
             if (updatedIngredientsCount > 0)
             {
                 for (int i = 0; i < updatedIngredientsCount; i++)
                 {
-                    var updatedIngredient = updatedCocktail.Ingredients[i];
-
-                    if (!dbCocktail.Ingredients.Contains(updatedIngredient))
-                    {
-                        dbCocktail.Ingredients.Add(updatedIngredient);
-                    }
+                    dbCocktail.Ingredients.Add(updatedCocktail.Ingredients[i]);
 
                 }
             }
-
         }
     }
 }

@@ -1,4 +1,4 @@
-namespace MyCocktailsApp
+namespace MyCocktailsApi
 {
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Hosting;

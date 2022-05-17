@@ -100,3 +100,5 @@ C:\Users\biser.hristov\Documents\MyCocktails\MyCocktailsApp\bin\Debug\net5.0\Mic
 C:\Users\biser.hristov\Documents\MyCocktails\MyCocktailsApp\bin\Debug\net5.0\Microsoft.Extensions.Options.dll
 C:\Users\biser.hristov\Documents\MyCocktails\MyCocktailsApp\bin\Debug\net5.0\Microsoft.Extensions.Primitives.dll
 C:\Users\biser.hristov\Documents\MyCocktails\MyCocktailsApp\bin\Debug\net5.0\System.Runtime.CompilerServices.Unsafe.dll
+C:\Users\biser.hristov\Documents\MyCocktails\MyCocktailsApp\bin\Debug\net5.0\AspNetCore.Identity.MongoDbCore.dll
+C:\Users\biser.hristov\Documents\MyCocktails\MyCocktailsApp\bin\Debug\net5.0\MongoDbGenericRepository.dll

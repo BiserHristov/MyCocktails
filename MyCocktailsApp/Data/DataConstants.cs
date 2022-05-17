@@ -1,10 +1,5 @@
-﻿namespace MyCocktailsApp.Data
+﻿namespace MyCocktailsApi.Data
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
-
     public class DataConstants
     {
         public class Cocktail
@@ -24,6 +19,12 @@
             public const int NameMaxLength = 20;
             public const int QuantityMinLength = 1;
             public const int QuantityMaxLength = 20;
+        }
+
+        public class User
+        {
+            public const int NameMinLength = 2;
+            public const int NameMaxLength = 20;
         }
     }
 }

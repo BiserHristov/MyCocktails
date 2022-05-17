@@ -1,12 +1,8 @@
-﻿namespace MyCocktailsApp.Infrastructure
+﻿namespace MyCocktailsApi.Infrastructure
 {
-    using System;
-    using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
-    using System.Linq;
-    using System.Threading.Tasks;
 
-    using static MyCocktailsApp.Data.DataConstants.Ingredient;
+    using static MyCocktailsApi.Data.DataConstants.Ingredient;
 
     public class ValidIfExistAttribute : ValidationAttribute
     {

@@ -1,7 +1,7 @@
-﻿namespace MyCocktailsApp
+﻿namespace MyCocktailsApi
 {
     using MongoDB.Bson.Serialization.Attributes;
-    using MyCocktailsApp.InputApiModels;
+    using MyCocktailsApi.InputApiModels;
     using System.Collections.Generic;
 
     public class RootApiModel
