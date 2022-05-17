@@ -13,6 +13,10 @@
 
     public static class ApplicationBuilderExtensions
     {
+        static ApplicationBuilderExtensions()
+        {
+
+        }
         public static async Task<IApplicationBuilder> PrepareDatabase(
            this IApplicationBuilder app, IMapper mapper)
         {
@@ -25,29 +29,36 @@
 
         private static async Task SeedData(IServiceProvider serviceProvider, IMapper mapper)
         {
-            var data = serviceProvider.GetRequiredService<ICocktailService>();
-            var dbDrinks = await data.GetAllAsync();
-
-            if (dbDrinks.Any())
+            try
             {
-                return;
-            }
+                var data = serviceProvider.GetRequiredService<ICocktailService>();
+                var dbCocktails = await data.GetAllAsync();
 
-            var importedDrinksModel = new RootApiModel();
-            using (var httpClient = new HttpClient())
-            {
-                string url = "https://www.thecocktaildb.com/api/json/v2/9973533/popular.php";
-
-                using (var response = await httpClient.GetAsync(url))
+                if (dbCocktails.Any())
                 {
-                    string apiResponse = await response.Content.ReadAsStringAsync();
-                    importedDrinksModel = JsonConvert.DeserializeObject<RootApiModel>(apiResponse);
+                    return;
+                }
+
+                var importedDrinksModel = new RootApiModel();
+                using (var httpClient = new HttpClient())
+                {
+                    string url = "https://www.thecocktaildb.com/api/json/v2/9973533/popular.php";
+
+                    using (var response = await httpClient.GetAsync(url))
+                    {
+                        string apiResponse = await response.Content.ReadAsStringAsync();
+                        importedDrinksModel = JsonConvert.DeserializeObject<RootApiModel>(apiResponse);
+                    }
+                }
+                foreach (var apiCocktail in importedDrinksModel.Cocktails)
+                {
+                    var cocktail = mapper.Map<InputCocktailModel>(apiCocktail);
+                    await data.CreateAsync(cocktail);
                 }
             }
-            foreach (var drink in importedDrinksModel.Drinks)
+            catch (Exception ex)
             {
-                var cocktail = mapper.Map<InputCocktailModel>(drink);
-                await data.CreateAsync(cocktail);
+
             }
         }
     }

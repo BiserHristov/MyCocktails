@@ -3,8 +3,10 @@
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.Extensions.Logging;
     using MyCocktailsApi.Data.Models;
     using MyCocktailsApi.Models;
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
@@ -15,11 +17,16 @@
     {
         private readonly UserManager<ApplicationUser> userManager;
         private readonly SignInManager<ApplicationUser> signInManager;
+        private readonly ILogger<AccountController> logger;
 
-        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+        public AccountController(
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
+            ILogger<AccountController> logger)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
+            this.logger = logger;
         }
 
         [HttpGet("Index")]
@@ -41,7 +48,16 @@
                 return BadRequest(string.Join("\n", errorMessages));
             }
 
-            var user = await userManager.FindByEmailAsync(logInModel.Email);
+            var user = new ApplicationUser();
+
+            try
+            {
+                user = await userManager.FindByEmailAsync(logInModel.Email);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Failed to search for registerd user.");
+            }
 
             if (user == null)
             {
@@ -49,7 +65,16 @@
 
             }
 
-            var result = await signInManager.PasswordSignInAsync(user, logInModel.Password, false, false);
+            var result = new Microsoft.AspNetCore.Identity.SignInResult();
+
+            try
+            {
+                result = await signInManager.PasswordSignInAsync(user, logInModel.Password, false, false);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Failed to log in user");
+            }
 
             if (result.Succeeded)
             {

@@ -7,6 +7,6 @@
     public class RootApiModel
     {
         [BsonElement("drinks")]
-        public virtual ICollection<CocktailApiModel> Drinks { get; init; } = new HashSet<CocktailApiModel>();
+        public virtual ICollection<CocktailApiModel> Cocktails { get; init; } = new HashSet<CocktailApiModel>();
     }
 }

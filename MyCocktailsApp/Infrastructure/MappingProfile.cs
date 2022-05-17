@@ -16,6 +16,8 @@
             this.CreateMap<Cocktail, OutputCocktailModel>();
             this.CreateMap<Ingredient, OutputIngredientModel>();
             this.CreateMap<Cocktail, UpdateCocktailModel>();
+            this.CreateMap<OutputCocktailModel, UpdateCocktailModel>();
+
             this.CreateMap<InputIngredientModel, Ingredient>();
             this.CreateMap<CocktailApiModel, InputCocktailModel>()
                 .ForMember(c => c.Glass, cfg => cfg.MapFrom(m => m.GlassType.ToString()));

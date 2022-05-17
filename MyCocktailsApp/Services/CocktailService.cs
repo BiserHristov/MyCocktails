@@ -9,18 +9,23 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using Microsoft.Extensions.Logging;
+    using System;
 
     public class CocktailService : ICocktailService
     {
         private readonly IMongoCollection<Cocktail> cocktailsCollection;
         private readonly IMapper mapper;
-        public CocktailService(ICocktailDatabaseSettings settings, IMapper mapper)
+        private readonly ILogger<CocktailService> logger;
+
+        public CocktailService(ICocktailDatabaseSettings settings, IMapper mapper, ILogger<CocktailService> logger)
         {
             var client = new MongoClient(settings.ConnectionString);
             var database = client.GetDatabase(settings.DatabaseName);
 
             cocktailsCollection = database.GetCollection<Cocktail>(settings.CocktailsCollectionName);
             this.mapper = mapper;
+            this.logger = logger;
         }
         public async Task<IEnumerable<OutputCocktailModel>> GetAllAsync()
         {
@@ -51,16 +56,34 @@
 
         public async Task<Cocktail> CreateAsync(InputCocktailModel model)
         {
-            var cocktail = this.mapper.Map<Cocktail>(model);
-            await cocktailsCollection.InsertOneAsync(cocktail);
+            Cocktail cocktail = new Cocktail();
+
+            try
+            {
+                cocktail = this.mapper.Map<Cocktail>(model);
+                await cocktailsCollection.InsertOneAsync(cocktail);
+
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Failed to add new cocktail!");
+            }
+
             return cocktail;
         }
 
         public async Task UpdateAsync(UpdateCocktailModel currentCocktail, InputCocktailModel updatedCocktail)
         {
-            UpdateCocktail(currentCocktail, updatedCocktail);
+            try
+            {
+                UpdateCocktail(currentCocktail, updatedCocktail);
 
-            await cocktailsCollection.ReplaceOneAsync(c => c.Id == currentCocktail.Id, this.mapper.Map<Cocktail>(updatedCocktail));
+                await cocktailsCollection.ReplaceOneAsync(c => c.Id == currentCocktail.Id, this.mapper.Map<Cocktail>(updatedCocktail));
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Failed to update the cocktail!");
+            }
         }
 
         public async Task RemoveAsync(string id) =>

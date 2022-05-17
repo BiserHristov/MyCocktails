@@ -2,7 +2,9 @@
 {
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.Extensions.Logging;
     using MyCocktailsApi.Data.Models;
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
@@ -13,11 +15,16 @@
     {
         private readonly UserManager<ApplicationUser> userManager;
         private readonly RoleManager<ApplicationRole> roleManager;
+        private readonly ILogger<UserController> logger;
 
-        public UserController(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager)
+        public UserController(
+            UserManager<ApplicationUser> userManager,
+            RoleManager<ApplicationRole> roleManager,
+            ILogger<UserController> logger)
         {
             this.userManager = userManager;
             this.roleManager = roleManager;
+            this.logger = logger;
         }
 
         [HttpGet]
@@ -44,12 +51,28 @@
                 Email = user.Email
             };
 
-            var result = await userManager.CreateAsync(appUser, user.Password);
+            var result = new IdentityResult();
+
+            try
+            {
+                result = await userManager.CreateAsync(appUser, user.Password);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Failed to create user!");
+            }
 
             if (result.Succeeded)
             {
                 string role = isAdmin ? "Admin" : "User";
-                await userManager.AddToRoleAsync(appUser, role);
+                try
+                {
+                    await userManager.AddToRoleAsync(appUser, role);
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, "Failed to add role to user.");
+                }
 
                 return Ok("User is created!");
             }
@@ -83,7 +106,16 @@
                 Name = userRole.Name
             };
 
-            var result = await roleManager.CreateAsync(role);
+            var result = new IdentityResult();
+
+            try
+            {
+                result = await roleManager.CreateAsync(role);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Failed to create Role.");
+            }
 
             if (result.Succeeded)
             {
