@@ -8,8 +8,9 @@
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
     using MyCocktailsApi.Data.Models;
-    using MyCocktailsApi.Infrastructure;
     using MyCocktailsApi.Services;
+
+    using static ApiConstants.User;
 
     [Route("api/[controller]")]
     [ApiController]
@@ -35,7 +36,7 @@
         [HttpGet]
         public IActionResult Index()
         {
-            return Ok("You are at User Index page.");
+            return Ok(AtUserIndexPageMessage);
         }
 
         [HttpPost("CreateUser")]
@@ -48,15 +49,15 @@
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Unable to check if there is currently logged user.");
+                logger.LogError(ex, UnableCheckForUserMessage);
             }
 
             if (logedInUser != null)
             {
-                ModelState.AddModelError("", "User is already logged in.");
+                ModelState.AddModelError(string.Empty, UserAlreadyLoggedMessage);
             }
 
-            bool userExist = false; ;
+            bool userExist = false;
 
             try
             {
@@ -64,12 +65,12 @@
             }
             catch (Exception ex )
             {
-                logger.LogError(ex, "Failed to search for existing user by Email!");
+                logger.LogError(ex, FailedSearchForUserMessage);
             }
 
             if (userExist)
             {
-                ModelState.AddModelError("", "User with tha same Name or Email already exist.");
+                ModelState.AddModelError(string.Empty, AlreadyExistingUserMessage);
             }
 
             List<string> errorMessages = new List<string>();
@@ -94,7 +95,7 @@
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Failed to create user!");
+                logger.LogError(ex, FailCreateUserMessage);
             }
 
             if (result.Succeeded)
@@ -106,10 +107,10 @@
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(ex, "Failed to add role to user.");
+                    logger.LogError(ex, FailAddRoleToUserMessage);
                 }
 
-                return Ok("User is created!");
+                return Ok(SuccessfullyUserCreateMessage);
             }
             else
             {
@@ -149,12 +150,12 @@
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Failed to create Role.");
+                logger.LogError(ex, FailAddRoleMessage);
             }
 
             if (result.Succeeded)
             {
-                return Ok($"Role {role.Name} is created!");
+                return Ok(SuccessfullyRoleCreateMessage);
             }
             else
             {

@@ -3,6 +3,8 @@
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
 
+    using static ApiConstants.Secured;
+
     [Route("api/[controller]")]
     [ApiController]
 
@@ -11,14 +13,14 @@
         [HttpGet("User")]
         public IActionResult UserPage()
         {
-            return Ok("You are at page for Users.");
+            return Ok(AtUserPageMessage);
         }
 
         [HttpGet("Admin")]
         [Authorize(Roles = "Admin")]
         public IActionResult AdminPage()
         {
-            return Ok("You are at page for Admins.");
+            return Ok(AtAdminPageMessage);
         }
     }
 }

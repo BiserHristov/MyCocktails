@@ -1,10 +1,10 @@
 ﻿namespace MyCocktailsApi.Services
 {
+    using System.Threading.Tasks;
     using Microsoft.Extensions.Logging;
     using MongoDB.Driver;
     using MyCocktailsApi.Data.Models;
     using MyCocktailsApi.Settings;
-    using System.Threading.Tasks;
 
     public class UserService : IUserService
     {
@@ -18,7 +18,6 @@
             userCollection = database.GetCollection<User>(settings.UsersCollectionName);
             this.logger = logger;
         }
-
 
         public async Task<bool> UserExist(string email)
         {

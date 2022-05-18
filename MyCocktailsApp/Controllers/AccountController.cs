@@ -3,16 +3,16 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Security.Claims;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
     using MyCocktailsApi.Data.Models;
-    using MyCocktailsApi.Infrastructure;
     using MyCocktailsApi.Models;
     using MyCocktailsApi.Services;
+
+    using static ApiConstants.Account;
 
     [ApiController]
     [Route("api/[controller]")]
@@ -20,7 +20,6 @@
     {
         private readonly UserManager<ApplicationUser> userManager;
         private readonly SignInManager<ApplicationUser> signInManager;
-        private readonly IUserService userService;
         private readonly ILogger<AccountController> logger;
 
         public AccountController(
@@ -31,26 +30,24 @@
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
-            this.userService = userService;
             this.logger = logger;
         }
 
         [HttpGet("Index")]
         public IActionResult Index()
         {
-            return Ok("You are at Account Index page.");
+            return Ok(AtAccountPageMessage);
         }
 
         [HttpPost("LogIn")]
         [AllowAnonymous]
         public async Task<IActionResult> Login(InputLoginModel logInModel)
         {
-
             var logedInUser = await userManager.GetUserAsync(this.User);
 
             if (logedInUser != null)
             {
-                ModelState.AddModelError("", "User is already logged in.");
+                ModelState.AddModelError(string.Empty, AlreadyLoggedMessage);
             }
 
             List<string> errorMessages = new List<string>();
@@ -70,12 +67,12 @@
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Failed to search for registerd user.");
+                logger.LogError(ex, FailedSearcForUserMessage);
             }
 
             if (user == null)
             {
-                return NotFound("User doesn't exist!");
+                return NotFound(NotExistingUserMessage);
             }
 
             var result = new Microsoft.AspNetCore.Identity.SignInResult();
@@ -86,16 +83,16 @@
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Failed to log in user");
+                logger.LogError(ex, FailedLogInUserMessage);
             }
 
             if (result.Succeeded)
             {
-                return Ok($"You are redirected and logged In as {logInModel.Email}!");
+                return Ok(RedirectAndLogedInMessage + logInModel.Email);
             }
             else
             {
-                ModelState.AddModelError(nameof(logInModel.Email), "Invalid email or password!");
+                ModelState.AddModelError(nameof(logInModel.Email), InvalidEmailAndPasswordMessage);
                 errorMessages = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage)).ToList();
 
                 return BadRequest(string.Join("\n", errorMessages));
@@ -107,7 +104,7 @@
         public async Task<IActionResult> Logout()
         {
             await signInManager.SignOutAsync();
-            return Ok("You are redirected and logged Out!");
+            return Ok(RedirectAndLogedOutMessage);
         }
     }
 }

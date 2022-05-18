@@ -40,12 +40,10 @@ namespace MyCocktailsApi
             services.AddSingleton<IUserDatabaseSettings>(provider =>
              provider.GetRequiredService<IOptions<UserDatabaseSettings>>().Value);
 
-
             services.AddAutoMapper(typeof(Startup));
 
             services.AddTransient<ICocktailService, CocktailService>();
             services.AddTransient<IUserService, UserService>();
-
 
             services.AddControllers().AddNewtonsoftJson(options => options.UseMemberCasing());
 

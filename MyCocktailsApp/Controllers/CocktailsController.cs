@@ -3,13 +3,14 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using AutoMapper;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using MyCocktailsApi.Data.Models;
     using MyCocktailsApi.Infrastructure;
     using MyCocktailsApi.Models;
     using MyCocktailsApi.Services;
+
+    using static ApiConstants.Cocktail;
 
     [Route("api/[controller]")]
     [ApiController]
@@ -102,7 +103,7 @@
 
             await cocktailService.UpdateLikes(cocktail, userId);
 
-            return Ok("Likes were updated");
+            return Ok(UpdatedLikesMessage);
         }
 
         [HttpPut("{id:length(24)}")]
@@ -122,7 +123,7 @@
 
             await cocktailService.UpdateAsync(dbCocktail, updatedtCocktail);
 
-            return Ok("The cocktail is updated.");
+            return Ok(UpdatedCocktailMessage);
         }
 
         [HttpDelete("{id:length(24)}")]
@@ -137,7 +138,7 @@
 
             await cocktailService.RemoveAsync(id);
 
-            return Ok("The cocktail is deleted.");
+            return Ok(DeletedCocktailMessage);
         }
     }
 }
