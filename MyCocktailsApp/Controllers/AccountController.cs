@@ -3,13 +3,16 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Security.Claims;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
     using MyCocktailsApi.Data.Models;
+    using MyCocktailsApi.Infrastructure;
     using MyCocktailsApi.Models;
+    using MyCocktailsApi.Services;
 
     [ApiController]
     [Route("api/[controller]")]
@@ -17,15 +20,18 @@
     {
         private readonly UserManager<ApplicationUser> userManager;
         private readonly SignInManager<ApplicationUser> signInManager;
+        private readonly IUserService userService;
         private readonly ILogger<AccountController> logger;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
+            IUserService userService,
             ILogger<AccountController> logger)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
+            this.userService = userService;
             this.logger = logger;
         }
 
@@ -37,8 +43,16 @@
 
         [HttpPost("LogIn")]
         [AllowAnonymous]
-        public async Task<IActionResult> Login(LoginInputModel logInModel)
+        public async Task<IActionResult> Login(InputLoginModel logInModel)
         {
+
+            var logedInUser = await userManager.GetUserAsync(this.User);
+
+            if (logedInUser != null)
+            {
+                ModelState.AddModelError("", "User is already logged in.");
+            }
+
             List<string> errorMessages = new List<string>();
 
             if (!ModelState.IsValid)

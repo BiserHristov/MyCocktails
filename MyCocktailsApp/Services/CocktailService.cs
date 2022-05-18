@@ -14,7 +14,7 @@
 
     public class CocktailService : ICocktailService
     {
-        private readonly IMongoCollection<Cocktail> cocktailsCollection;
+        private readonly IMongoCollection<Cocktail> cocktailCollection;
         private readonly IMapper mapper;
         private readonly ILogger<CocktailService> logger;
 
@@ -23,14 +23,14 @@
             var client = new MongoClient(settings.ConnectionString);
             var database = client.GetDatabase(settings.DatabaseName);
 
-            cocktailsCollection = database.GetCollection<Cocktail>(settings.CocktailsCollectionName);
+            cocktailCollection = database.GetCollection<Cocktail>(settings.CocktailsCollectionName);
             this.mapper = mapper;
             this.logger = logger;
         }
 
         public async Task<IEnumerable<OutputCocktailModel>> GetAllAsync()
         {
-            var dbCocktails = await cocktailsCollection.Find(cocktail => true).ToListAsync();
+            var dbCocktails = await cocktailCollection.Find(cocktail => true).ToListAsync();
             return mapper.Map<IEnumerable<OutputCocktailModel>>(dbCocktails);
         }
 
@@ -40,7 +40,7 @@
 
             try
             {
-                var dbCocktail = await cocktailsCollection.Find(cocktail => cocktail.Id == id).FirstOrDefaultAsync();
+                var dbCocktail = await cocktailCollection.Find(cocktail => cocktail.Id == id).FirstOrDefaultAsync();
                 cocktailModel = mapper.Map<OutputCocktailModel>(dbCocktail);
             }
             catch (Exception ex)
@@ -58,7 +58,7 @@
             try
             {
                 name = name.ToLower();
-                var dbCocktail = await cocktailsCollection.Find(cocktail => cocktail.Name.ToLower() == name).FirstOrDefaultAsync();
+                var dbCocktail = await cocktailCollection.Find(cocktail => cocktail.Name.ToLower() == name).FirstOrDefaultAsync();
                 cocktailModel = mapper.Map<OutputCocktailModel>(dbCocktail);
             }
             catch (Exception ex)
@@ -72,7 +72,7 @@
         public async Task<IEnumerable<OutputCocktailModel>> GetByCategoryAsync(string category)
         {
             category = category.ToLower();
-            var cocktailModel = await cocktailsCollection.Find(cocktail => cocktail.Category.ToLower() == category).ToListAsync();
+            var cocktailModel = await cocktailCollection.Find(cocktail => cocktail.Category.ToLower() == category).ToListAsync();
             return mapper.Map<IEnumerable<OutputCocktailModel>>(cocktailModel);
         }
 
@@ -83,7 +83,7 @@
             try
             {
                 var dbCocktail = mapper.Map<Cocktail>(model);
-                await cocktailsCollection.InsertOneAsync(dbCocktail);
+                await cocktailCollection.InsertOneAsync(dbCocktail);
                 cocktail = mapper.Map<OutputCocktailModel>(dbCocktail);
             }
             catch (Exception ex)
@@ -102,7 +102,7 @@
 
                 var cocktail = mapper.Map<Cocktail>(dbCocktail);
 
-                await cocktailsCollection.ReplaceOneAsync(c => c.Id == dbCocktail.Id, cocktail);
+                await cocktailCollection.ReplaceOneAsync(c => c.Id == dbCocktail.Id, cocktail);
             }
             catch (Exception ex)
             {
@@ -124,7 +124,7 @@
                 }
 
                 var dbCocktail = mapper.Map<Cocktail>(model);
-                await cocktailsCollection.ReplaceOneAsync(c => c.Id == dbCocktail.Id, dbCocktail);
+                await cocktailCollection.ReplaceOneAsync(c => c.Id == dbCocktail.Id, dbCocktail);
             }
             catch (Exception ex)
             {
@@ -133,7 +133,7 @@
         }
 
         public async Task RemoveAsync(string id) =>
-            await cocktailsCollection.DeleteOneAsync(cocktail => cocktail.Id == id);
+            await cocktailCollection.DeleteOneAsync(cocktail => cocktail.Id == id);
 
         private void UpdateCocktail(OutputCocktailModel dbCocktail, InputCocktailModel updatedCocktail)
         {

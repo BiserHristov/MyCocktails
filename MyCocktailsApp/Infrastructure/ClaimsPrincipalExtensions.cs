@@ -8,7 +8,7 @@
 
     public static class ClaimsPrincipalExtensions
     {
-        public static string GetId(this ClaimsPrincipal user)
-           => user.FindFirst(ClaimTypes.Email).Value;
+        public static string GetId(this ClaimsPrincipal user) =>
+            user.FindFirst(ClaimTypes.Email).Value;
     }
 }

@@ -26,19 +26,26 @@ namespace MyCocktailsApi
 
         public void ConfigureServices(IServiceCollection services)
         {
-            var mongoDbSettings = Configuration.GetSection(nameof(MongoDbConfig)).Get<MongoDbConfig>();
+            var mongoDbSettings = Configuration.GetSection(nameof(UserDatabaseSettings)).Get<UserDatabaseSettings>();
 
             services.AddIdentity<ApplicationUser, ApplicationRole>()
-                .AddMongoDbStores<ApplicationUser, ApplicationRole, Guid>(mongoDbSettings.ConnectionString, mongoDbSettings.AuthDbName);
+                .AddMongoDbStores<ApplicationUser, ApplicationRole, Guid>(mongoDbSettings.ConnectionString, mongoDbSettings.DatabaseName);
 
             services.Configure<CocktailDatabaseSettings>(Configuration.GetSection(nameof(CocktailDatabaseSettings)));
+            services.Configure<UserDatabaseSettings>(Configuration.GetSection(nameof(UserDatabaseSettings)));
 
             services.AddSingleton<ICocktailDatabaseSettings>(provider =>
              provider.GetRequiredService<IOptions<CocktailDatabaseSettings>>().Value);
 
+            services.AddSingleton<IUserDatabaseSettings>(provider =>
+             provider.GetRequiredService<IOptions<UserDatabaseSettings>>().Value);
+
+
             services.AddAutoMapper(typeof(Startup));
 
             services.AddTransient<ICocktailService, CocktailService>();
+            services.AddTransient<IUserService, UserService>();
+
 
             services.AddControllers().AddNewtonsoftJson(options => options.UseMemberCasing());
 

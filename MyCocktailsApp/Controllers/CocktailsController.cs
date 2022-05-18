@@ -66,7 +66,7 @@
         {
             var cocktails = await cocktailService.GetByCategoryAsync(category);
 
-            if (cocktails == null)
+            if (!cocktails.Any())
             {
                 return NotFound();
             }
@@ -122,7 +122,7 @@
 
             await cocktailService.UpdateAsync(dbCocktail, updatedtCocktail);
 
-            return NoContent();
+            return Ok("The cocktail is updated.");
         }
 
         [HttpDelete("{id:length(24)}")]
@@ -137,7 +137,7 @@
 
             await cocktailService.RemoveAsync(id);
 
-            return NoContent();
+            return Ok("The cocktail is deleted.");
         }
     }
 }

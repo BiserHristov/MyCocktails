@@ -8,22 +8,27 @@
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
     using MyCocktailsApi.Data.Models;
+    using MyCocktailsApi.Infrastructure;
+    using MyCocktailsApi.Services;
 
     [Route("api/[controller]")]
     [ApiController]
-    public class UserController : ControllerBase    // :Controller
+    public class UserController : ControllerBase 
     {
         private readonly UserManager<ApplicationUser> userManager;
         private readonly RoleManager<ApplicationRole> roleManager;
+        private readonly IUserService userService;
         private readonly ILogger<UserController> logger;
 
         public UserController(
             UserManager<ApplicationUser> userManager,
             RoleManager<ApplicationRole> roleManager,
+            IUserService userService,
             ILogger<UserController> logger)
         {
             this.userManager = userManager;
             this.roleManager = roleManager;
+            this.userService = userService;
             this.logger = logger;
         }
 
@@ -36,6 +41,37 @@
         [HttpPost("CreateUser")]
         public async Task<IActionResult> Create(User user, bool isAdmin)
         {
+            var logedInUser = new ApplicationUser();
+            try
+            {
+                logedInUser = await userManager.GetUserAsync(this.User);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Unable to check if there is currently logged user.");
+            }
+
+            if (logedInUser != null)
+            {
+                ModelState.AddModelError("", "User is already logged in.");
+            }
+
+            bool userExist = false; ;
+
+            try
+            {
+                userExist = await userService.UserExist(user.Email);
+            }
+            catch (Exception ex )
+            {
+                logger.LogError(ex, "Failed to search for existing user by Email!");
+            }
+
+            if (userExist)
+            {
+                ModelState.AddModelError("", "User with tha same Name or Email already exist.");
+            }
+
             List<string> errorMessages = new List<string>();
 
             if (!ModelState.IsValid)
@@ -51,7 +87,7 @@
             };
 
             var result = new IdentityResult();
-            
+
             try
             {
                 result = await userManager.CreateAsync(appUser, user.Password);
