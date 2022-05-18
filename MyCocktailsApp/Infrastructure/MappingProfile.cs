@@ -1,6 +1,7 @@
 ﻿namespace MyCocktailsApi.Infrastructure
 {
     using System;
+    using System.Globalization;
     using System.Linq;
     using System.Text;
     using AutoMapper;
@@ -33,9 +34,10 @@
 
         public static string RemoveSymbols(string input)
         {
-            var sb = new StringBuilder();
+            input = input.Replace("glass", "", true, CultureInfo.InvariantCulture);
             var symbols = new char[] { ' ', '-' };
             var inputAsCharArr = input.ToCharArray();
+
 
             if (!inputAsCharArr.Any(x => symbols.Contains(x)))
             {
@@ -43,6 +45,7 @@
             }
 
             var previousCharIsSymbol = false;
+            var sb = new StringBuilder();
 
             for (int i = 0; i < inputAsCharArr.Length; i++)
             {
