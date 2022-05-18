@@ -1,13 +1,13 @@
 ﻿namespace MyCocktailsApi.Controllers
 {
-    using Microsoft.AspNetCore.Identity;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.Extensions.Logging;
-    using MyCocktailsApi.Data.Models;
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using Microsoft.AspNetCore.Identity;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.Extensions.Logging;
+    using MyCocktailsApi.Data.Models;
 
     [Route("api/[controller]")]
     [ApiController]
@@ -32,7 +32,6 @@
         {
             return Ok("You are at User Index page.");
         }
-
 
         [HttpPost("CreateUser")]
         public async Task<IActionResult> Create(User user, bool isAdmin)
@@ -80,7 +79,7 @@
             {
                 foreach (var error in result.Errors)
                 {
-                    ModelState.AddModelError("", error.Description);
+                    ModelState.AddModelError(string.Empty, error.Description);
                 }
 
                 errorMessages = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage)).ToList();
@@ -125,7 +124,7 @@
             {
                 foreach (var error in result.Errors)
                 {
-                    ModelState.AddModelError("", error.Description);
+                    ModelState.AddModelError(string.Empty, error.Description);
                 }
 
                 errorMessages = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage)).ToList();

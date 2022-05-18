@@ -1,10 +1,10 @@
 ﻿namespace MyCocktailsApi.InputApiModels
 {
-    using MyCocktailsApi.Models;
-    using Newtonsoft.Json;
     using System;
     using System.Collections.Generic;
     using System.Runtime.Serialization;
+    using MyCocktailsApi.Models;
+    using Newtonsoft.Json;
 
     public class CocktailApiModel
     {
@@ -20,13 +20,12 @@
         [JsonProperty("strGlass")]
         public GlassType GlassType { get; set; }
 
-
         [JsonProperty("strDrinkThumb")]
         public string PictureUrl { get; set; }
 
         [JsonProperty("dateModified")]
         public DateTime DateModified { get; set; }
-      
+
         [JsonProperty("strIngredient1")]
         public string Ingredient1 { get; set; }
 
@@ -85,8 +84,6 @@
                 ingredient.Quantity = quantity == null ? string.Empty : quantity.ToString();
                 Ingredients.Add(ingredient);
             }
-
         }
-
     }
 }

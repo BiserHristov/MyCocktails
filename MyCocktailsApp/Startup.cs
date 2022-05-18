@@ -1,5 +1,7 @@
 namespace MyCocktailsApi
 {
+    using System;
+    using System.Threading.Tasks;
     using AutoMapper;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
@@ -12,8 +14,6 @@ namespace MyCocktailsApi
     using MyCocktailsApi.Infrastructure;
     using MyCocktailsApi.Services;
     using MyCocktailsApi.Settings;
-    using System;
-    using System.Threading.Tasks;
 
     public class Startup
     {
@@ -46,7 +46,6 @@ namespace MyCocktailsApi
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "MyCocktailsApp", Version = "v1" });
             });
-
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IMapper mapper)
@@ -58,7 +57,6 @@ namespace MyCocktailsApi
                 })
                 .GetAwaiter()
                 .GetResult();
-
 
             app.UseDeveloperExceptionPage();
 

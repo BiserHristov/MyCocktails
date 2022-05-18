@@ -20,6 +20,5 @@
         {
             return Ok("You are at page for Admins.");
         }
-
     }
 }

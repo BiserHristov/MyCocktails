@@ -1,9 +1,9 @@
 ﻿namespace MyCocktailsApi.InputApiModels
 {
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Converters;
     using System.ComponentModel;
     using System.Runtime.Serialization;
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Converters;
 
     [JsonConverter(typeof(StringEnumConverter))]
     public enum GlassType

@@ -1,9 +1,8 @@
-﻿
-namespace MyCocktailsApi.Data.Models
+﻿namespace MyCocktailsApi.Data.Models
 {
+    using System;
     using AspNetCore.Identity.MongoDbCore.Models;
     using MongoDbGenericRepository.Attributes;
-    using System;
 
     [CollectionName("Users")]
     public class ApplicationUser : MongoIdentityUser<Guid>

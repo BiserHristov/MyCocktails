@@ -1,17 +1,16 @@
 ﻿namespace MyCocktailsApi.Services
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using Microsoft.Extensions.Logging;
+    using System;
     using AutoMapper;
     using MongoDB.Driver;
     using MongoDB.Driver.Linq;
     using MyCocktailsApi.Settings;
     using MyCocktailsApi.Data.Models;
     using MyCocktailsApi.Models;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
-    using Microsoft.Extensions.Logging;
-    using System;
-    using MyCocktailsApi.InputApiModels;
 
     public class CocktailService : ICocktailService
     {
@@ -28,6 +27,7 @@
             this.mapper = mapper;
             this.logger = logger;
         }
+
         public async Task<IEnumerable<OutputCocktailModel>> GetAllAsync()
         {
             var dbCocktails = await cocktailsCollection.Find(cocktail => true).ToListAsync();
@@ -45,7 +45,6 @@
             name = name.ToLower();
             var cocktailModel = await cocktailsCollection.Find(cocktail => cocktail.Name.ToLower() == name).FirstOrDefaultAsync();
             return this.mapper.Map<OutputCocktailModel>(cocktailModel);
-
         }
 
         public async Task<IEnumerable<OutputCocktailModel>> GetByCategoryAsync(string category)
@@ -64,7 +63,6 @@
                 var dbCocktail = this.mapper.Map<Cocktail>(model);
                 await cocktailsCollection.InsertOneAsync(dbCocktail);
                 cocktail = this.mapper.Map<OutputCocktailModel>(dbCocktail);
-
             }
             catch (Exception ex)
             {
@@ -155,14 +153,8 @@
                 {
                     var dbCocktailIngredent = this.mapper.Map<OutputIngredientModel>(updatedCocktail.Ingredients[i]);
                     dbCocktail.Ingredients.Add(dbCocktailIngredent);
-
                 }
             }
-        }
-
-        public Task<OutputCocktailModel> Like(string id)
-        {
-            throw new NotImplementedException();
         }
     }
 }

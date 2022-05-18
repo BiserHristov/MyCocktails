@@ -1,9 +1,10 @@
 ﻿namespace MyCocktailsApi.Models
 {
-    using MyCocktailsApi.Infrastructure;
     using System.ComponentModel.DataAnnotations;
+    using MyCocktailsApi.Infrastructure;
 
     using static MyCocktailsApi.Data.DataConstants.Ingredient;
+
     public class InputIngredientModel
     {
         [Required]

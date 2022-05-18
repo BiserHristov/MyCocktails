@@ -1,6 +1,7 @@
 ﻿namespace MyCocktailsApi.Models
 {
     using MongoDB.Bson.Serialization.Attributes;
+    using MyCocktailsApi.Infrastructure;
     using Newtonsoft.Json;
     using System;
     using System.Collections.Generic;
@@ -32,6 +33,7 @@
         public IList<InputIngredientModel> Ingredients { get; init; } = new List<InputIngredientModel>();
 
         [Required]
+        [CheckDateRange]
         [DataType(DataType.DateTime)]
         public DateTime DateModified { get; set; }
 

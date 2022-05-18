@@ -1,15 +1,15 @@
 ﻿namespace MyCocktailsApi.Controllers
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
     using MyCocktailsApi.Data.Models;
     using MyCocktailsApi.Models;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
 
     [ApiController]
     [Route("api/[controller]")]
@@ -62,7 +62,6 @@
             if (user == null)
             {
                 return NotFound("User doesn't exist!");
-
             }
 
             var result = new Microsoft.AspNetCore.Identity.SignInResult();
@@ -82,13 +81,11 @@
             }
             else
             {
-
                 ModelState.AddModelError(nameof(logInModel.Email), "Invalid email or password!");
                 errorMessages = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage)).ToList();
 
                 return BadRequest(string.Join("\n", errorMessages));
             }
-
         }
 
         [Authorize]

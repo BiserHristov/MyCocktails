@@ -1,9 +1,9 @@
-﻿using MyCocktailsApi.Infrastructure;
-using System.ComponentModel.DataAnnotations;
-using static MyCocktailsApi.Data.DataConstants.Ingredient;
-
-namespace MyCocktailsApi.Data.Models
+﻿namespace MyCocktailsApi.Data.Models
 {
+    using System.ComponentModel.DataAnnotations;
+    using MyCocktailsApi.Infrastructure;
+    using static MyCocktailsApi.Data.DataConstants.Ingredient;
+
     public class Ingredient
     {
         [Required]
@@ -12,6 +12,5 @@ namespace MyCocktailsApi.Data.Models
 
         [ValidIfExist]
         public string? Quantity { get; set; }
-
     }
 }

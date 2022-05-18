@@ -1,36 +1,31 @@
 ﻿namespace MyCocktailsApi.Controllers
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
     using AutoMapper;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
-    using Microsoft.Extensions.Logging;
     using MyCocktailsApi.Data.Models;
     using MyCocktailsApi.Infrastructure;
     using MyCocktailsApi.Models;
     using MyCocktailsApi.Services;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
 
     [Route("api/[controller]")]
     [ApiController]
     public class CocktailsController : ControllerBase
     {
         private readonly ICocktailService cocktailService;
-        private readonly IMapper mapper;
 
-        public CocktailsController(ICocktailService drinkService, IMapper mapper)
+        public CocktailsController(ICocktailService drinkService)
         {
             this.cocktailService = drinkService;
-            this.mapper = mapper;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             var outputCocktails = await cocktailService.GetAllAsync();
-
 
             if (!outputCocktails.Any())
             {
@@ -107,11 +102,8 @@
 
             await cocktailService.UpdateLikes(cocktail, userId);
 
-
             return Ok("Likes were updated");
-
         }
-
 
         [HttpPut("{id:length(24)}")]
         public async Task<IActionResult> Update(string id, InputCocktailModel updatedtCocktail)
@@ -128,7 +120,6 @@
                 return NotFound();
             }
 
-            //var updateCocktailModel = this.mapper.Map<UpdateCocktailModel>(dbCocktail);
             await cocktailService.UpdateAsync(dbCocktail, updatedtCocktail);
 
             return NoContent();
@@ -148,6 +139,5 @@
 
             return NoContent();
         }
-
     }
 }

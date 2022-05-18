@@ -1,8 +1,8 @@
 ﻿namespace MyCocktailsApi.Data.Models
 {
     using System.ComponentModel.DataAnnotations;
-
     using static MyCocktailsApi.Data.DataConstants.User;
+
     public class User
     {
         [Required]
