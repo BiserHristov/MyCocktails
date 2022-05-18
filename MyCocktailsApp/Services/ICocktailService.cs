@@ -11,8 +11,8 @@
         Task<OutputCocktailModel> GetByIdAsync(string id);
         Task<OutputCocktailModel> GetByNameAsync(string name);
         Task<IEnumerable<OutputCocktailModel>> GetByCategoryAsync(string category);
-        Task<Cocktail> CreateAsync(InputCocktailModel cocktail);
-        Task UpdateAsync(UpdateCocktailModel currentCocktail, InputCocktailModel updatedCocktail);
+        Task<OutputCocktailModel> CreateAsync(InputCocktailModel cocktail);
+        Task UpdateAsync(OutputCocktailModel dbCoctail, InputCocktailModel updatedCocktail);
         Task RemoveAsync(string id);
         Task UpdateLikes(OutputCocktailModel model, string userId);
     }

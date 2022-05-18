@@ -11,6 +11,7 @@
     using System.Threading.Tasks;
     using Microsoft.Extensions.Logging;
     using System;
+    using MyCocktailsApi.InputApiModels;
 
     public class CocktailService : ICocktailService
     {
@@ -54,14 +55,15 @@
             return this.mapper.Map<IEnumerable<OutputCocktailModel>>(cocktailModel);
         }
 
-        public async Task<Cocktail> CreateAsync(InputCocktailModel model)
+        public async Task<OutputCocktailModel> CreateAsync(InputCocktailModel model)
         {
-            Cocktail cocktail = new Cocktail();
+            OutputCocktailModel cocktail = new OutputCocktailModel();
 
             try
             {
-                cocktail = this.mapper.Map<Cocktail>(model);
-                await cocktailsCollection.InsertOneAsync(cocktail);
+                var dbCocktail = this.mapper.Map<Cocktail>(model);
+                await cocktailsCollection.InsertOneAsync(dbCocktail);
+                cocktail = this.mapper.Map<OutputCocktailModel>(dbCocktail);
 
             }
             catch (Exception ex)
@@ -72,13 +74,15 @@
             return cocktail;
         }
 
-        public async Task UpdateAsync(UpdateCocktailModel currentCocktail, InputCocktailModel updatedCocktail)
+        public async Task UpdateAsync(OutputCocktailModel dbCocktail, InputCocktailModel updatedCocktail)
         {
             try
             {
-                UpdateCocktail(currentCocktail, updatedCocktail);
+                UpdateCocktail(dbCocktail, updatedCocktail);
 
-                await cocktailsCollection.ReplaceOneAsync(c => c.Id == currentCocktail.Id, this.mapper.Map<Cocktail>(updatedCocktail));
+                var cocktail = this.mapper.Map<Cocktail>(dbCocktail);
+
+                await cocktailsCollection.ReplaceOneAsync(c => c.Id == dbCocktail.Id, cocktail);
             }
             catch (Exception ex)
             {
@@ -111,7 +115,7 @@
         public async Task RemoveAsync(string id) =>
             await cocktailsCollection.DeleteOneAsync(cocktail => cocktail.Id == id);
 
-        private void UpdateCocktail(UpdateCocktailModel dbCocktail, InputCocktailModel updatedCocktail)
+        private void UpdateCocktail(OutputCocktailModel dbCocktail, InputCocktailModel updatedCocktail)
         {
             if (!string.IsNullOrWhiteSpace(updatedCocktail.Name) &&
                 updatedCocktail.Name != dbCocktail.Name)
@@ -131,12 +135,15 @@
                 dbCocktail.Instructions = updatedCocktail.Instructions;
             }
 
-            if (updatedCocktail.Likes >= 0)
+            if (dbCocktail.Glass != updatedCocktail.Glass)
             {
-                dbCocktail.Likes = updatedCocktail.Likes;
+                dbCocktail.Glass = updatedCocktail.Glass;
             }
 
-
+            if (dbCocktail.DateModified != updatedCocktail.DateModified)
+            {
+                dbCocktail.DateModified = updatedCocktail.DateModified;
+            }
 
             dbCocktail.Ingredients.Clear();
 
@@ -146,7 +153,8 @@
             {
                 for (int i = 0; i < updatedIngredientsCount; i++)
                 {
-                    dbCocktail.Ingredients.Add(updatedCocktail.Ingredients[i]);
+                    var dbCocktailIngredent = this.mapper.Map<OutputIngredientModel>(updatedCocktail.Ingredients[i]);
+                    dbCocktail.Ingredients.Add(dbCocktailIngredent);
 
                 }
             }

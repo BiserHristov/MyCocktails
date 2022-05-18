@@ -1,6 +1,7 @@
 ﻿namespace MyCocktailsApi.Controllers
 {
     using AutoMapper;
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
     using MyCocktailsApi.Data.Models;
@@ -86,11 +87,12 @@
                 return BadRequest();
             }
 
-            await cocktailService.CreateAsync(model);
+            var insertedDbModel = await cocktailService.CreateAsync(model);
 
-            return Ok(model);
+            return Ok(insertedDbModel);
         }
 
+        [Authorize]
         [HttpPost("Like/{id}")]
         public async Task<IActionResult> Like(string id)
         {
@@ -126,8 +128,8 @@
                 return NotFound();
             }
 
-            var updateCocktailModel = this.mapper.Map<UpdateCocktailModel>(dbCocktail);
-            await cocktailService.UpdateAsync(updateCocktailModel, updatedtCocktail);
+            //var updateCocktailModel = this.mapper.Map<UpdateCocktailModel>(dbCocktail);
+            await cocktailService.UpdateAsync(dbCocktail, updatedtCocktail);
 
             return NoContent();
         }

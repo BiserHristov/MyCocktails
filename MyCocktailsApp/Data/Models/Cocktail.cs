@@ -32,8 +32,6 @@
 
         [Required]
         [Range(0, int.MaxValue)]
-
-        [JsonIgnore]
         public int Likes
         {
             get
@@ -43,7 +41,7 @@
         }
 
         [IgnoreDataMember]
-        public IList<string> UsersLike{ get; set; } = new List<string>();
+        public IList<string> UsersLike { get; set; } = new List<string>();
 
         [Required]
         [EnumDataType(typeof(GlassType))]
