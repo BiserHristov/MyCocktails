@@ -4,6 +4,7 @@
     using System.Linq;
     using System.Text;
     using AutoMapper;
+    using MyCocktailsApi.Data;
     using MyCocktailsApi.Data.Models;
     using MyCocktailsApi.InputApiModels;
     using MyCocktailsApi.Models;
@@ -15,9 +16,13 @@
             this.CreateMap<InputCocktailModel, Cocktail>()
                 .ForMember(c => c.Glass, cfg => cfg.MapFrom(m => Enum.Parse<GlassType>(RemoveSymbols(m.Glass))));
 
-            this.CreateMap<Cocktail, OutputCocktailModel>();
+            this.CreateMap<Cocktail, OutputCocktailModel>()
+                 .ForMember(c => c.DateModified, cfg => cfg.MapFrom(m => m.DateModified.ToLocalTime()));
             this.CreateMap<Ingredient, OutputIngredientModel>();
-            this.CreateMap<OutputCocktailModel, Cocktail>();
+            this.CreateMap<OutputCocktailModel, Cocktail>()
+                .ForMember(c => c.Glass, cfg => cfg.MapFrom(m => Enum.Parse<GlassType>(RemoveSymbols(m.Glass))))
+                .ForMember(c => c.DateModified, cfg => cfg.MapFrom(m => m.DateModified.ToUniversalTime()));
+
             this.CreateMap<InputIngredientModel, Ingredient>();
             this.CreateMap<OutputIngredientModel, Ingredient>();
             this.CreateMap<OutputIngredientModel, InputIngredientModel>();

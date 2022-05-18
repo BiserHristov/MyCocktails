@@ -17,9 +17,9 @@
     {
         private readonly ICocktailService cocktailService;
 
-        public CocktailsController(ICocktailService drinkService)
+        public CocktailsController(ICocktailService cocktailService)
         {
-            this.cocktailService = drinkService;
+            this.cocktailService = cocktailService;
         }
 
         [HttpGet]
@@ -64,14 +64,14 @@
         [HttpGet("category/{category}")]
         public async Task<ActionResult<IEnumerable<Cocktail>>> GetByCategoryName(string category)
         {
-            var cocktail = await cocktailService.GetByCategoryAsync(category);
+            var cocktails = await cocktailService.GetByCategoryAsync(category);
 
-            if (cocktail == null)
+            if (cocktails == null)
             {
                 return NotFound();
             }
 
-            return Ok(cocktail);
+            return Ok(cocktails);
         }
 
         [HttpPost]

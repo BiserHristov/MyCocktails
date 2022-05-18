@@ -9,7 +9,7 @@
         public override bool IsValid(object value)
         {
             var quantityAsString = value as string;
-            if (quantityAsString == null)
+            if (string.IsNullOrWhiteSpace(quantityAsString))
             {
                 return true;
             }

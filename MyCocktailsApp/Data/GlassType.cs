@@ -1,4 +1,4 @@
-﻿namespace MyCocktailsApi.InputApiModels
+﻿namespace MyCocktailsApi.Data
 {
     using System.ComponentModel;
     using System.Runtime.Serialization;
