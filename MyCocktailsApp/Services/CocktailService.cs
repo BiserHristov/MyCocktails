@@ -1,16 +1,16 @@
 ﻿namespace MyCocktailsApi.Services
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using Microsoft.Extensions.Logging;
-    using System;
     using AutoMapper;
+    using Microsoft.Extensions.Logging;
     using MongoDB.Driver;
     using MongoDB.Driver.Linq;
-    using MyCocktailsApi.Settings;
     using MyCocktailsApi.Data.Models;
     using MyCocktailsApi.Models;
+    using MyCocktailsApi.Settings;
 
     public class CocktailService : ICocktailService
     {
@@ -76,14 +76,14 @@
             return mapper.Map<IEnumerable<OutputCocktailModel>>(cocktailModel);
         }
 
-        public async Task<OutputCocktailModel> CreateAsync(InputCocktailModel model)
+        public async Task<OutputCocktailModel> CreateAsync(InputCocktailServiceModel model)
         {
             OutputCocktailModel cocktail = new OutputCocktailModel();
-
+         
             try
             {
                 var dbCocktail = mapper.Map<Cocktail>(model);
-                await cocktailCollection.InsertOneAsync(dbCocktail);
+                 await cocktailCollection.InsertOneAsync(dbCocktail);
                 cocktail = mapper.Map<OutputCocktailModel>(dbCocktail);
             }
             catch (Exception ex)

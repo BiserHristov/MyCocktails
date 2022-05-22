@@ -9,6 +9,7 @@
     using MyCocktailsApi.Data.Models;
     using MyCocktailsApi.InputApiModels;
     using MyCocktailsApi.Models;
+    using MyCocktailsApi.Services;
 
     public class MappingProfile : Profile
     {
@@ -16,6 +17,15 @@
         {
             this.CreateMap<InputCocktailModel, Cocktail>()
                 .ForMember(c => c.Glass, cfg => cfg.MapFrom(m => Enum.Parse<GlassType>(RemoveSymbols(m.Glass))));
+            this.CreateMap<InputCocktailModel, OutputCocktailModel>();
+            this.CreateMap<OutputCocktailModel, InputCocktailModel>();
+
+            this.CreateMap<InputCocktailModel, InputCocktailServiceModel>();
+            this.CreateMap<InputCocktailServiceModel, Cocktail>();
+            this.CreateMap<InputCocktailServiceModel, OutputCocktailModel>();
+
+            this.CreateMap<CocktailApiModel, InputCocktailServiceModel>()
+             .ForMember(c => c.Glass, cfg => cfg.MapFrom(m => m.GlassType.ToString()));
 
             this.CreateMap<Cocktail, OutputCocktailModel>()
                  .ForMember(c => c.DateModified, cfg => cfg.MapFrom(m => m.DateModified.ToLocalTime()));
@@ -34,10 +44,9 @@
 
         public static string RemoveSymbols(string input)
         {
-            input = input.Replace("glass", "", true, CultureInfo.InvariantCulture);
+            input = input.Replace("glass", string.Empty, true, CultureInfo.InvariantCulture);
             var symbols = new char[] { ' ', '-' };
             var inputAsCharArr = input.ToCharArray();
-
 
             if (!inputAsCharArr.Any(x => symbols.Contains(x)))
             {

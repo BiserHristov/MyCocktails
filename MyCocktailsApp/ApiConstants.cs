@@ -31,7 +31,6 @@
         {
             public const string AtUserIndexPageMessage = "You are at User Index page.";
             public const string UnableCheckForUserMessage = "Unable to check if there is currently logged user.";
-
             public const string UserAlreadyLoggedMessage = "User is already logged in.";
             public const string FailedSearchForUserMessage = "Failed to search for existing user by Email!";
             public const string AlreadyExistingUserMessage = "User with tha same Name or Email already exist.";

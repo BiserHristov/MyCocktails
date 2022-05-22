@@ -1,8 +1,10 @@
 ﻿namespace MyCocktailsApi.Controllers
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using AutoMapper;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using MyCocktailsApi.Data.Models;
@@ -17,10 +19,12 @@
     public class CocktailsController : ControllerBase
     {
         private readonly ICocktailService cocktailService;
+        private readonly IMapper mapper;
 
-        public CocktailsController(ICocktailService cocktailService)
+        public CocktailsController(ICocktailService cocktailService, IMapper mapper)
         {
             this.cocktailService = cocktailService;
+            this.mapper = mapper;
         }
 
         [HttpGet]
@@ -28,7 +32,7 @@
         {
             var outputCocktails = await cocktailService.GetAllAsync();
 
-            if (!outputCocktails.Any())
+            if (outputCocktails == null || !outputCocktails.Any())
             {
                 return NotFound();
             }
@@ -39,6 +43,11 @@
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(string id)
         {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
             var outputCocktail = await cocktailService.GetByIdAsync(id);
 
             if (outputCocktail == null)
@@ -52,6 +61,11 @@
         [HttpGet("name/{name}")]
         public async Task<IActionResult> GetByName(string name)
         {
+            if (name == null)
+            {
+                return NotFound();
+            }
+
             var outputCocktail = await cocktailService.GetByNameAsync(name);
 
             if (outputCocktail == null)
@@ -63,11 +77,16 @@
         }
 
         [HttpGet("category/{category}")]
-        public async Task<ActionResult<IEnumerable<Cocktail>>> GetByCategoryName(string category)
+        public async Task<IActionResult> GetByCategoryName(string category)
         {
+            if (category == null)
+            {
+                return NotFound();
+            }
+
             var cocktails = await cocktailService.GetByCategoryAsync(category);
 
-            if (!cocktails.Any())
+            if (cocktails == null || !cocktails.Any())
             {
                 return NotFound();
             }
@@ -76,22 +95,28 @@
         }
 
         [HttpPost]
-        public async Task<ActionResult<Cocktail>> Create(InputCocktailModel model)
+        public async Task<IActionResult> Create(InputCocktailModel model)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
 
-            var insertedDbModel = await cocktailService.CreateAsync(model);
+            var cocktailServiceModel = this.mapper.Map<InputCocktailServiceModel>(model);
+            var outputModel = await cocktailService.CreateAsync(cocktailServiceModel);
 
-            return Ok(insertedDbModel);
+            return Ok(outputModel);
         }
 
         [Authorize]
         [HttpPost("Like/{id}")]
         public async Task<IActionResult> Like(string id)
         {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
             var cocktail = await cocktailService.GetByIdAsync(id);
 
             if (cocktail == null)

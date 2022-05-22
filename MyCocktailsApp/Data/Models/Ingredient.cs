@@ -11,6 +11,6 @@
         public string Name { get; set; }
 
         [ValidIfExist]
-        public string? Quantity { get; set; }
+        public string Quantity { get; set; }
     }
 }

@@ -2,6 +2,7 @@
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
+    using MyCocktailsApi.Data.Models;
     using MyCocktailsApi.Models;
 
     public interface ICocktailService
@@ -14,7 +15,7 @@
 
         Task<IEnumerable<OutputCocktailModel>> GetByCategoryAsync(string category);
 
-        Task<OutputCocktailModel> CreateAsync(InputCocktailModel cocktail);
+        Task<OutputCocktailModel> CreateAsync(InputCocktailServiceModel cocktail);
 
         Task UpdateAsync(OutputCocktailModel dbCoctail, InputCocktailModel updatedCocktail);
 

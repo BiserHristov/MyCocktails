@@ -1,5 +1,7 @@
 ﻿namespace MyCocktailsApi.Models
 {
+    using Microsoft.AspNetCore.Mvc;
+    using MongoDB.Bson;
     using MongoDB.Bson.Serialization.Attributes;
     using MyCocktailsApi.Infrastructure;
     using Newtonsoft.Json;
@@ -11,6 +13,7 @@
 
     public class InputCocktailModel
     {
+
         [Required]
         [StringLength(NameMaxLength, MinimumLength = NameMinLength)]
         public string Name { get; set; }
@@ -27,7 +30,7 @@
         public string Glass { get; set; }
 
         [Url]
-        public string? PictureUrl { get; set; }
+        public string PictureUrl { get; set; }
 
         [Required]
         public IList<InputIngredientModel> Ingredients { get; init; } = new List<InputIngredientModel>();

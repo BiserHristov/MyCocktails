@@ -14,7 +14,7 @@
 
     [Route("api/[controller]")]
     [ApiController]
-    public class UserController : ControllerBase 
+    public class UserController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> userManager;
         private readonly RoleManager<ApplicationRole> roleManager;
@@ -63,7 +63,7 @@
             {
                 userExist = await userService.UserExist(user.Email);
             }
-            catch (Exception ex )
+            catch (Exception ex)
             {
                 logger.LogError(ex, FailedSearchForUserMessage);
             }

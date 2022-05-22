@@ -16,7 +16,7 @@
         public class Ingredient
         {
             public const int NameMinLength = 2;
-            public const int NameMaxLength = 20;
+            public const int NameMaxLength = 24;
             public const int QuantityMinLength = 1;
             public const int QuantityMaxLength = 20;
         }
