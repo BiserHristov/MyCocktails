@@ -19,6 +19,15 @@
             public const string UpdatedLikesMessage = "Likes were updated.";
             public const string UpdatedCocktailMessage = "The cocktail is updated.";
             public const string DeletedCocktailMessage = "The cocktail is deleted.";
+            public const string NotExistingOrEmptyCollectionMessage = "Not existing or empty collection.";
+            public const string RequiredIdMessage = "Id is required.";
+            public const string NotExistingCocktailMessage = "The cocktail doesn't exist!";
+            public const string RequriedNameMessage = "Name is required.";
+            public const string NotExistingCocktailWithNameMessage = "Cocktail with name {0} doesn't exist";
+            public const string RequiredCategoryMessage = "Category is required.";
+            public const string InvalidModelMessage = "The model is invalid.";
+            public const string UnauthorizedMessage = "Unauthorized! Please Login!";
+            public const string TestUserEmail = "TestUser@av.bg";
         }
 
         public class Secured

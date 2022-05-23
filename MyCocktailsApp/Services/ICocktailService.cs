@@ -19,7 +19,7 @@
 
         Task UpdateAsync(OutputCocktailModel dbCoctail, InputCocktailModel updatedCocktail);
 
-        Task RemoveAsync(string id);
+        Task DeleteAsync(string id);
 
         Task UpdateLikes(OutputCocktailModel model, string userId);
     }

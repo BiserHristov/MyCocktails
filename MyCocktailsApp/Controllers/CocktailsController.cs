@@ -1,17 +1,14 @@
 ﻿namespace MyCocktailsApi.Controllers
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
     using AutoMapper;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
-    using MyCocktailsApi.Data.Models;
-    using MyCocktailsApi.Infrastructure;
     using MyCocktailsApi.Models;
     using MyCocktailsApi.Services;
-
+    using System;
+    using System.Linq;
+    using System.Security.Claims;
+    using System.Threading.Tasks;
     using static ApiConstants.Cocktail;
 
     [Route("api/[controller]")]
@@ -20,11 +17,12 @@
     {
         private readonly ICocktailService cocktailService;
         private readonly IMapper mapper;
-
+        public Func<string> GetUserId;
         public CocktailsController(ICocktailService cocktailService, IMapper mapper)
         {
             this.cocktailService = cocktailService;
             this.mapper = mapper;
+            GetUserId = () => User.FindFirst(ClaimTypes.Email).Value;
         }
 
         [HttpGet]
@@ -34,7 +32,7 @@
 
             if (outputCocktails == null || !outputCocktails.Any())
             {
-                return NotFound();
+                return NotFound(NotExistingOrEmptyCollectionMessage);
             }
 
             return Ok(outputCocktails);
@@ -45,14 +43,14 @@
         {
             if (id == null)
             {
-                return NotFound();
+                return BadRequest(RequiredIdMessage);
             }
 
             var outputCocktail = await cocktailService.GetByIdAsync(id);
 
             if (outputCocktail == null)
             {
-                return NotFound();
+                return NotFound(NotExistingCocktailMessage);
             }
 
             return Ok(outputCocktail);
@@ -63,14 +61,14 @@
         {
             if (name == null)
             {
-                return NotFound();
+                return BadRequest(RequriedNameMessage);
             }
 
             var outputCocktail = await cocktailService.GetByNameAsync(name);
 
             if (outputCocktail == null)
             {
-                return NotFound();
+                return NotFound(string.Format(NotExistingCocktailWithNameMessage, name));
             }
 
             return Ok(outputCocktail);
@@ -81,14 +79,14 @@
         {
             if (category == null)
             {
-                return NotFound();
+                return BadRequest(RequiredCategoryMessage);
             }
 
             var cocktails = await cocktailService.GetByCategoryAsync(category);
 
             if (cocktails == null || !cocktails.Any())
             {
-                return NotFound();
+                return NotFound(NotExistingOrEmptyCollectionMessage);
             }
 
             return Ok(cocktails);
@@ -99,7 +97,7 @@
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest();
+                return BadRequest(InvalidModelMessage);
             }
 
             var cocktailServiceModel = this.mapper.Map<InputCocktailServiceModel>(model);
@@ -112,38 +110,51 @@
         [HttpPost("Like/{id}")]
         public async Task<IActionResult> Like(string id)
         {
+            var userId = GetUserId();
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return BadRequest(UnauthorizedMessage);
+            }
+
             if (id == null)
             {
-                return NotFound();
+                return BadRequest(RequiredIdMessage);
             }
 
             var cocktail = await cocktailService.GetByIdAsync(id);
 
             if (cocktail == null)
             {
-                return NotFound();
+                return NotFound(NotExistingCocktailMessage);
             }
-
-            var userId = this.User.GetId();
 
             await cocktailService.UpdateLikes(cocktail, userId);
 
             return Ok(UpdatedLikesMessage);
         }
 
+        [Authorize]
         [HttpPut("{id:length(24)}")]
         public async Task<IActionResult> Update(string id, InputCocktailModel updatedtCocktail)
         {
+            var userId = GetUserId();
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return BadRequest(UnauthorizedMessage);
+            }
+
             if (!ModelState.IsValid)
             {
-                return BadRequest();
+                return BadRequest(InvalidModelMessage);
             }
 
             var dbCocktail = await cocktailService.GetByIdAsync(id);
 
             if (dbCocktail == null)
             {
-                return NotFound();
+                return NotFound(NotExistingCocktailMessage);
             }
 
             await cocktailService.UpdateAsync(dbCocktail, updatedtCocktail);
@@ -151,17 +162,30 @@
             return Ok(UpdatedCocktailMessage);
         }
 
+        [Authorize]
         [HttpDelete("{id:length(24)}")]
         public async Task<IActionResult> Delete(string id)
         {
+            var userId = GetUserId();
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return BadRequest(UnauthorizedMessage);
+            }
+
+            if (id == null)
+            {
+                return BadRequest(RequiredIdMessage);
+            }
+
             var cocktail = await cocktailService.GetByIdAsync(id);
 
             if (cocktail == null)
             {
-                return NotFound();
+                return NotFound(NotExistingCocktailMessage);
             }
 
-            await cocktailService.RemoveAsync(id);
+            await cocktailService.DeleteAsync(id);
 
             return Ok(DeletedCocktailMessage);
         }

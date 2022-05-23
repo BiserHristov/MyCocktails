@@ -132,7 +132,7 @@
             }
         }
 
-        public async Task RemoveAsync(string id) =>
+        public async Task DeleteAsync(string id) =>
             await cocktailCollection.DeleteOneAsync(cocktail => cocktail.Id == id);
 
         private void UpdateCocktail(OutputCocktailModel dbCocktail, InputCocktailModel updatedCocktail)
