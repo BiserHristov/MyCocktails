@@ -43,7 +43,7 @@
         public async Task<IActionResult> Create(User user, bool isAdmin)
         {
             var logedInUser = new ApplicationUser();
-           
+
             bool userExist = false;
 
             try
@@ -53,6 +53,7 @@
             catch (Exception ex)
             {
                 logger.LogError(ex, FailedSearchForUserMessage);
+                return BadRequest(FailedSearchForUserMessage);
             }
 
             if (userExist)
@@ -83,6 +84,7 @@
             catch (Exception ex)
             {
                 logger.LogError(ex, FailCreateUserMessage);
+                return BadRequest(FailCreateUserMessage);
             }
 
             if (result.Succeeded)
@@ -95,6 +97,8 @@
                 catch (Exception ex)
                 {
                     logger.LogError(ex, FailAddRoleToUserMessage);
+                    return BadRequest(FailAddRoleToUserMessage);
+
                 }
 
                 return Ok(SuccessfullyUserCreateMessage);
@@ -138,6 +142,7 @@
             catch (Exception ex)
             {
                 logger.LogError(ex, FailAddRoleMessage);
+                return BadRequest(FailAddRoleMessage);
             }
 
             if (result.Succeeded)

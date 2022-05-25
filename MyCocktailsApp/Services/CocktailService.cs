@@ -11,6 +11,7 @@
     using MyCocktailsApi.Data.Models;
     using MyCocktailsApi.Models;
     using MyCocktailsApi.Settings;
+    using static ApiConstants.CocktailService;
 
     public class CocktailService : ICocktailService
     {
@@ -31,7 +32,8 @@
         public async Task<IEnumerable<CocktailServiceModel>> GetAllAsync()
         {
             var dbCocktails = await cocktailCollection.Find(cocktail => true).ToListAsync();
-            return mapper.Map<IEnumerable<CocktailServiceModel>>(dbCocktails);
+            var mappedCocktails = mapper.Map<IEnumerable<CocktailServiceModel>>(dbCocktails);
+            return mappedCocktails;
         }
 
         public async Task<CocktailServiceModel> GetByIdAsync(string id)
@@ -45,7 +47,8 @@
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Failed to get the cocktail by id!");
+                logger.LogError(ex, FailedByIdMessage);
+                throw new ArgumentNullException();
             }
 
             return cocktailModel;
@@ -63,7 +66,8 @@
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Failed to get the cocktail by name!");
+                logger.LogError(ex, FailedByNameMessage);
+                throw new ArgumentNullException();
             }
 
             return cocktailModel;
@@ -71,27 +75,36 @@
 
         public async Task<IEnumerable<CocktailServiceModel>> GetByCategoryAsync(string category)
         {
-            category = category.ToLower();
-            var cocktailModel = await cocktailCollection.Find(cocktail => cocktail.Category.ToLower() == category).ToListAsync();
-            return mapper.Map<IEnumerable<CocktailServiceModel>>(cocktailModel);
+            try
+            {
+                category = category.ToLower();
+                var cocktailModel = await cocktailCollection.Find(cocktail => cocktail.Category.ToLower() == category).ToListAsync();
+                var mappedReesult = mapper.Map<IEnumerable<CocktailServiceModel>>(cocktailModel);
+                return mappedReesult;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, FailedByCategoryMessage);
+                throw new ArgumentNullException();
+            }
         }
 
         public async Task<CocktailServiceModel> CreateAsync(CocktailServiceModel model)
         {
-            CocktailServiceModel cocktail = new CocktailServiceModel();
-
             try
             {
                 var dbCocktail = mapper.Map<Cocktail>(model);
                 await cocktailCollection.InsertOneAsync(dbCocktail);
-                cocktail = mapper.Map<CocktailServiceModel>(dbCocktail);
+                var cocktail = mapper.Map<CocktailServiceModel>(dbCocktail);
+                return cocktail;
+
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Failed to add new cocktail!");
+                logger.LogError(ex, FailedCreateMessage);
+                throw new ArgumentNullException();
             }
 
-            return cocktail;
         }
 
         public async Task UpdateAsync(CocktailServiceModel dbCocktail, CocktailServiceModel updatedCocktail)
@@ -106,7 +119,8 @@
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Failed to update the cocktail!");
+                logger.LogError(ex, FailedUpdateCocktailMessage);
+                throw new ArgumentNullException();
             }
         }
 
@@ -128,12 +142,24 @@
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Failed to update likes!");
+                logger.LogError(ex, FailedUpdateLikesMessage);
+                throw new ArgumentNullException();
             }
         }
 
-        public async Task DeleteAsync(string id) =>
-            await cocktailCollection.DeleteOneAsync(cocktail => cocktail.Id == id);
+        public async Task DeleteAsync(string id)
+        {
+            try
+            {
+                await cocktailCollection.DeleteOneAsync(cocktail => cocktail.Id == id);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, FailedUDeleteCocktailMessage);
+                throw new ArgumentNullException();
+            }
+        }
+            
 
         private void UpdateCocktail(CocktailServiceModel dbCocktail, CocktailServiceModel updatedCocktail)
         {

@@ -49,5 +49,21 @@
             public const string FailAddRoleMessage = "Failed to create Role.";
             public const string SuccessfullyRoleCreateMessage = "Role is created!";
         }
+
+        public class CocktailService
+        {
+            public const string FailedByIdMessage = "Failed to get the cocktail by id!";
+
+            public const string FailedByNameMessage = "Failed to get the cocktail by name!";
+            public const string FailedByCategoryMessage = "Failed to get the cocktail by \"category\"!";
+            public const string FailedCreateMessage = "Failed to create new cocktail!";
+            public const string FailedUpdateCocktailMessage = "Failed to update the cocktail!";
+            public const string FailedUpdateLikesMessage = "Failed to update likes!";
+            public const string FailedUDeleteCocktailMessage = "Failed to delete the cocktail!";
+
+
+
+
+        }
     }
 }
