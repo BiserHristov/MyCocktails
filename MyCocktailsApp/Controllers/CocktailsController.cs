@@ -8,10 +8,11 @@
     using AutoMapper;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
-    using Microsoft.Extensions.Logging;
     using MyCocktailsApi.Models;
     using MyCocktailsApi.Services;
     using static ApiConstants.Cocktail;
+    using static ApiConstants.CocktailService;
+
 
     [Route("api/[controller]")]
     [ApiController]
@@ -64,7 +65,7 @@
             }
             catch (Exception)
             {
-                return BadRequest("Failed to get the cocktail by id! Check the \"id\" and try again.");
+                return BadRequest($"{FailedByIdMessage} Check the \"id\" and try again.");
             }
 
         }
@@ -92,7 +93,7 @@
             }
             catch (Exception)
             {
-                return BadRequest("Failed to get the cocktail by name! Check the \"name\" and try again.");
+                return BadRequest($"{FailedByNameMessage} Check the \"name\" and try again.");
             }
         }
 
@@ -119,7 +120,7 @@
             }
             catch (Exception)
             {
-                return BadRequest("Failed to get the cocktail by \"category\"! Check the \"category\" and try again.");
+                return BadRequest($"{FailedByCategoryMessage} Check the \"category\" and try again.");
             }
         }
 
@@ -140,7 +141,7 @@
             }
             catch (Exception)
             {
-                return BadRequest("Failed to create the cocktail! Check the cocktail and try again.");
+                return BadRequest($"{FailedCreateMessage} Check the cocktail and try again.");
 
             }
         }
@@ -176,7 +177,7 @@
             }
             catch (Exception)
             {
-                return BadRequest("Failed to like the cocktail. Please try again!");
+                return BadRequest($"{FailedUpdateLikesMessage} Please try again!");
             }
         }
 
@@ -213,7 +214,7 @@
             }
             catch (Exception)
             {
-                return BadRequest("Failed to update the cocktail! Please try again.");
+                return BadRequest($"{FailedUpdateCocktailMessage} Please try again.");
             }
         }
 
@@ -248,7 +249,7 @@
             }
             catch (Exception)
             {
-                return BadRequest("Failed to delete the cocktail! Please try again.");
+                return BadRequest($"{FailedUDeleteCocktailMessage} Please try again.");
             }
         }
     }
