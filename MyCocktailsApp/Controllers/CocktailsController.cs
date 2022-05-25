@@ -1,23 +1,25 @@
 ﻿namespace MyCocktailsApi.Controllers
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Security.Claims;
+    using System.Threading.Tasks;
     using AutoMapper;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using MyCocktailsApi.Models;
     using MyCocktailsApi.Services;
-    using System;
-    using System.Linq;
-    using System.Security.Claims;
-    using System.Threading.Tasks;
     using static ApiConstants.Cocktail;
 
     [Route("api/[controller]")]
     [ApiController]
     public class CocktailsController : ControllerBase
     {
+        public Func<string> GetUserId;
         private readonly ICocktailService cocktailService;
         private readonly IMapper mapper;
-        public Func<string> GetUserId;
+
         public CocktailsController(ICocktailService cocktailService, IMapper mapper)
         {
             this.cocktailService = cocktailService;
@@ -28,13 +30,14 @@
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var outputCocktails = await cocktailService.GetAllAsync();
+            var resultCocktails = await cocktailService.GetAllAsync();
 
-            if (outputCocktails == null || !outputCocktails.Any())
+            if (resultCocktails == null || !resultCocktails.Any())
             {
                 return NotFound(NotExistingOrEmptyCollectionMessage);
             }
 
+            var outputCocktails = this.mapper.Map<IEnumerable<OutputCocktailModel>>(resultCocktails);
             return Ok(outputCocktails);
         }
 
@@ -46,12 +49,14 @@
                 return BadRequest(RequiredIdMessage);
             }
 
-            var outputCocktail = await cocktailService.GetByIdAsync(id);
+            var searchedCocktail = await cocktailService.GetByIdAsync(id);
 
-            if (outputCocktail == null)
+            if (searchedCocktail == null)
             {
                 return NotFound(NotExistingCocktailMessage);
             }
+
+            var outputCocktail = this.mapper.Map<OutputCocktailModel>(searchedCocktail);
 
             return Ok(outputCocktail);
         }
@@ -64,12 +69,14 @@
                 return BadRequest(RequriedNameMessage);
             }
 
-            var outputCocktail = await cocktailService.GetByNameAsync(name);
+            var searchedCocktail = await cocktailService.GetByNameAsync(name);
 
-            if (outputCocktail == null)
+            if (searchedCocktail == null)
             {
                 return NotFound(string.Format(NotExistingCocktailWithNameMessage, name));
             }
+
+            var outputCocktail = this.mapper.Map<OutputCocktailModel>(searchedCocktail);
 
             return Ok(outputCocktail);
         }
@@ -82,14 +89,16 @@
                 return BadRequest(RequiredCategoryMessage);
             }
 
-            var cocktails = await cocktailService.GetByCategoryAsync(category);
+            var resultCocktails = await cocktailService.GetByCategoryAsync(category);
 
-            if (cocktails == null || !cocktails.Any())
+            if (resultCocktails == null || !resultCocktails.Any())
             {
                 return NotFound(NotExistingOrEmptyCollectionMessage);
             }
 
-            return Ok(cocktails);
+            var outputCocktails = this.mapper.Map<IEnumerable<OutputCocktailModel>>(resultCocktails);
+           
+            return Ok(outputCocktails);
         }
 
         [HttpPost]
@@ -100,15 +109,15 @@
                 return BadRequest(InvalidModelMessage);
             }
 
-            var cocktailServiceModel = this.mapper.Map<InputCocktailServiceModel>(model);
-            var outputModel = await cocktailService.CreateAsync(cocktailServiceModel);
-
-            return Ok(outputModel);
+            var cocktailServiceModel = this.mapper.Map<CocktailServiceModel>(model);
+            var insertedModel = await cocktailService.CreateAsync(cocktailServiceModel);
+            var outputCocktail= this.mapper.Map<OutputCocktailModel>(insertedModel);
+            return Ok(outputCocktail);
         }
 
         [Authorize]
-        [HttpPost("Like/{id}")]
-        public async Task<IActionResult> Like(string id)
+        [HttpPost("Like/{cocktailId}")]
+        public async Task<IActionResult> Like(string cocktailId)
         {
             var userId = GetUserId();
 
@@ -117,26 +126,26 @@
                 return BadRequest(UnauthorizedMessage);
             }
 
-            if (id == null)
+            if (cocktailId == null)
             {
                 return BadRequest(RequiredIdMessage);
             }
 
-            var cocktail = await cocktailService.GetByIdAsync(id);
+            var searchedCocktail = await cocktailService.GetByIdAsync(cocktailId);
 
-            if (cocktail == null)
+            if (searchedCocktail == null)
             {
                 return NotFound(NotExistingCocktailMessage);
             }
 
-            await cocktailService.UpdateLikes(cocktail, userId);
+            await cocktailService.UpdateLikes(searchedCocktail, userId);
 
             return Ok(UpdatedLikesMessage);
         }
 
         [Authorize]
-        [HttpPut("{id:length(24)}")]
-        public async Task<IActionResult> Update(string id, InputCocktailModel updatedtCocktail)
+        [HttpPut("{cocktailId:length(24)}")]
+        public async Task<IActionResult> Update(string cocktailId, InputCocktailModel updatedtCocktail)
         {
             var userId = GetUserId();
 
@@ -150,21 +159,23 @@
                 return BadRequest(InvalidModelMessage);
             }
 
-            var dbCocktail = await cocktailService.GetByIdAsync(id);
+            var searchedCocktail = await cocktailService.GetByIdAsync(cocktailId);
 
-            if (dbCocktail == null)
+            if (searchedCocktail == null)
             {
                 return NotFound(NotExistingCocktailMessage);
             }
 
-            await cocktailService.UpdateAsync(dbCocktail, updatedtCocktail);
+            var updatedCocktailServiceModel = this.mapper.Map<CocktailServiceModel>(updatedtCocktail);
+
+            await cocktailService.UpdateAsync(searchedCocktail, updatedCocktailServiceModel);
 
             return Ok(UpdatedCocktailMessage);
         }
 
         [Authorize]
-        [HttpDelete("{id:length(24)}")]
-        public async Task<IActionResult> Delete(string id)
+        [HttpDelete("{cocktailId:length(24)}")]
+        public async Task<IActionResult> Delete(string cocktailId)
         {
             var userId = GetUserId();
 
@@ -173,19 +184,19 @@
                 return BadRequest(UnauthorizedMessage);
             }
 
-            if (id == null)
+            if (cocktailId == null)
             {
                 return BadRequest(RequiredIdMessage);
             }
 
-            var cocktail = await cocktailService.GetByIdAsync(id);
+            var searchedCocktail = await cocktailService.GetByIdAsync(cocktailId);
 
-            if (cocktail == null)
+            if (searchedCocktail == null)
             {
                 return NotFound(NotExistingCocktailMessage);
             }
 
-            await cocktailService.DeleteAsync(id);
+            await cocktailService.DeleteAsync(cocktailId);
 
             return Ok(DeletedCocktailMessage);
         }

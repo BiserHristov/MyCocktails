@@ -2,19 +2,17 @@ namespace MyCocktailsApi.Tests
 {
     using System;
     using System.Collections.Generic;
-    using System.Text;
     using System.Threading.Tasks;
     using AutoMapper;
     using FluentAssertions;
     using Microsoft.AspNetCore.Mvc;
     using Moq;
     using MyCocktailsApi.Controllers;
-    using MyCocktailsApi.Data;
     using MyCocktailsApi.Infrastructure;
     using MyCocktailsApi.Models;
     using MyCocktailsApi.Services;
+    using MyCocktailsApi.Tests.Data;
     using Xunit;
-
     using static ApiConstants.Cocktail;
 
     public class CockatilsControllerTests
@@ -22,9 +20,7 @@ namespace MyCocktailsApi.Tests
         private readonly Mock<ICocktailService> mockedService = new();
         private readonly Mock<IMapper> mockedMapper = new();
         private readonly IMapper mapper;
-        private readonly Random rand = new();
         private readonly CocktailsController controller;
-
 
         public CockatilsControllerTests()
         {
@@ -60,7 +56,7 @@ namespace MyCocktailsApi.Tests
         public async Task GetAllCocktails_WhenCocktailsCollectionIsEmpty_ReturnsNotFound()
         {
             //Arrange
-            var emptyList = new List<OutputCocktailModel>();
+            var emptyList = new List<CocktailServiceModel>();
             mockedService.Setup(s => s.GetAllAsync()).ReturnsAsync(emptyList);
 
             //Act
@@ -75,8 +71,10 @@ namespace MyCocktailsApi.Tests
         public async Task GetAllCocktails_WhenCocktailsExist_ReturnsAllCocktails()
         {
             //Arrange
-            var cocktailList = GetGocktails(3);
+            var cocktailList = Helper.GetGocktails(3);
+            var outputModelCocktails = this.mapper.Map<IEnumerable<OutputCocktailModel>>(cocktailList);
             mockedService.Setup(s => s.GetAllAsync()).ReturnsAsync(cocktailList);
+            mockedMapper.Setup(m => m.Map<IEnumerable<OutputCocktailModel>>(cocktailList)).Returns(outputModelCocktails);
 
             //Act
             var result = await controller.GetAll();
@@ -120,8 +118,10 @@ namespace MyCocktailsApi.Tests
         public async Task GetCocktailById_WhenCocktailsExist_ReturnsExpectedCocktail()
         {
             //Arrange
-            var expectedCocktail = GetRandomCocktail();
+            var expectedCocktail = Helper.GetRandomCocktail();
+            var cocktailOutputModel = this.mapper.Map<OutputCocktailModel>(expectedCocktail);
             mockedService.Setup(s => s.GetByIdAsync(expectedCocktail.Id)).ReturnsAsync(expectedCocktail);
+            mockedMapper.Setup(m => m.Map<OutputCocktailModel>(expectedCocktail)).Returns(cocktailOutputModel);
 
             //Act
             var result = await controller.GetById(expectedCocktail.Id);
@@ -165,9 +165,10 @@ namespace MyCocktailsApi.Tests
         public async Task GetCocktailByName_WhenCocktailsExist_ReturnsExpectedCocktail()
         {
             //Arrange
-            var expectedCocktail = GetRandomCocktail();
+            var expectedCocktail = Helper.GetRandomCocktail();
+            var cocktailOutputModel = this.mapper.Map<OutputCocktailModel>(expectedCocktail);
             mockedService.Setup(s => s.GetByNameAsync(expectedCocktail.Name)).ReturnsAsync(expectedCocktail);
-
+            mockedMapper.Setup(m => m.Map<OutputCocktailModel>(expectedCocktail)).Returns(cocktailOutputModel);
             //Act
             var result = await controller.GetByName(expectedCocktail.Name);
             var dto = ((result as OkObjectResult).Value) as OutputCocktailModel;
@@ -210,7 +211,7 @@ namespace MyCocktailsApi.Tests
         public async Task GetCocktailsByCategory_WhenCocktailsCollectionIsEmpty_ReturnsNotFound()
         {
             //Arrange
-            var emptyList = new List<OutputCocktailModel>();
+            var emptyList = new List<CocktailServiceModel>();
             mockedService.Setup(s => s.GetByCategoryAsync(It.IsAny<string>())).ReturnsAsync(emptyList);
 
             //Act
@@ -225,9 +226,11 @@ namespace MyCocktailsApi.Tests
         public async Task GetCocktailsByCategory_WhenCocktailsCollectionExist_ReturnsCollection()
         {
             //Arrange
-            var cocktailList = GetGocktails(2);
+            var cocktailList = Helper.GetGocktails(2);
             cocktailList[1].Category = cocktailList[0].Category;
+            var outpuCocktails = this.mapper.Map<IEnumerable<OutputCocktailModel>>(cocktailList);
             mockedService.Setup(s => s.GetByCategoryAsync(cocktailList[0].Category)).ReturnsAsync(cocktailList);
+            mockedMapper.Setup(m => m.Map<IEnumerable<OutputCocktailModel>>(It.IsAny<IEnumerable<CocktailServiceModel>>())).Returns(outpuCocktails);
 
             //Act
             var result = await controller.GetByCategoryName(cocktailList[0].Category);
@@ -243,7 +246,7 @@ namespace MyCocktailsApi.Tests
         public async Task CreateCocktail_WithNullName_ReturnsBadRequest()
         {
             //Arrange
-            var modelCocktail = GetRandomCocktail();
+            var modelCocktail = Helper.GetRandomCocktail();
             var inputModel = mapper.Map<InputCocktailModel>(modelCocktail);
             inputModel.Name = null;
             controller.ModelState.AddModelError(string.Empty, RequriedNameMessage);
@@ -260,11 +263,12 @@ namespace MyCocktailsApi.Tests
         public async Task CreateCocktail_WithValidModel_ReturnsCreatedCocktail()
         {
             //Arrange
-            var modelCocktail = GetRandomCocktail();
+            var modelCocktail = Helper.GetRandomCocktail();
             var inputModel = mapper.Map<InputCocktailModel>(modelCocktail);
-            var inputServiceModel = mapper.Map<InputCocktailServiceModel>(inputModel);
-            mockedService.Setup(s => s.CreateAsync(inputServiceModel)).ReturnsAsync(modelCocktail);
-            mockedMapper.Setup(m => m.Map<InputCocktailServiceModel>(inputModel)).Returns(inputServiceModel);
+            var outputCocktailModel = mapper.Map<OutputCocktailModel>(modelCocktail);
+            mockedService.Setup(s => s.CreateAsync(modelCocktail)).ReturnsAsync(modelCocktail);
+            mockedMapper.Setup(m => m.Map<CocktailServiceModel>(inputModel)).Returns(modelCocktail);
+            mockedMapper.Setup(m => m.Map<OutputCocktailModel>(It.IsAny<CocktailServiceModel>())).Returns(outputCocktailModel);
 
             //Act
             var result = await controller.Create(inputModel);
@@ -272,7 +276,7 @@ namespace MyCocktailsApi.Tests
 
             //Assert
             result.Should().BeOfType<OkObjectResult>();
-            mockedService.Verify(s => s.CreateAsync(inputServiceModel), Times.Exactly(1));
+            mockedService.Verify(s => s.CreateAsync(modelCocktail), Times.Exactly(1));
             dto.Should().BeEquivalentTo(inputModel,
                 options => options.ComparingByMembers<OutputCocktailModel>());
         }
@@ -340,7 +344,7 @@ namespace MyCocktailsApi.Tests
                 GetUserId = () => TestUserEmail
             };
 
-            var cocktail = GetRandomCocktail();
+            var cocktail = Helper.GetRandomCocktail();
             mockedService.Setup(s => s.GetByIdAsync(cocktail.Id)).ReturnsAsync(cocktail);
             mockedService.Setup(s => s.UpdateLikes(cocktail, TestUserEmail));
 
@@ -356,8 +360,8 @@ namespace MyCocktailsApi.Tests
         public async Task UpdateCocktail_WhenNotLoggedIn_ReturnsBadRequest()
         {
             //Arrange
-            var cocktail = GetRandomCocktail();
-            var updatedCocktail = GetRandomCocktail();
+            var cocktail = Helper.GetRandomCocktail();
+            var updatedCocktail = Helper.GetRandomCocktail();
             var updatedCocktailInputModel = this.mapper.Map<InputCocktailModel>(updatedCocktail);
 
             var testController = new CocktailsController(mockedService.Object, mockedMapper.Object)
@@ -377,8 +381,8 @@ namespace MyCocktailsApi.Tests
         public async Task UpdateCocktail_WithNullName_ReturnsBadRequest()
         {
             //Arrange
-            var cocktail = GetRandomCocktail();
-            var updatedCocktail = GetRandomCocktail();
+            var cocktail = Helper.GetRandomCocktail();
+            var updatedCocktail = Helper.GetRandomCocktail();
             var updatedCocktailInputModel = mapper.Map<InputCocktailModel>(updatedCocktail);
             updatedCocktailInputModel.Name = null;
             var testController = new CocktailsController(mockedService.Object, mockedMapper.Object)
@@ -400,8 +404,8 @@ namespace MyCocktailsApi.Tests
         public async Task UpdateCocktail_WhenNotExisting_ReturnsNotFound()
         {
             //Arrange
-            var cocktail = GetRandomCocktail();
-            var updatedCocktail = GetRandomCocktail();
+            var cocktail = Helper.GetRandomCocktail();
+            var updatedCocktail = Helper.GetRandomCocktail();
             var updatedCocktailInputModel = mapper.Map<InputCocktailModel>(updatedCocktail);
             var testController = new CocktailsController(mockedService.Object, mockedMapper.Object)
             {
@@ -421,23 +425,24 @@ namespace MyCocktailsApi.Tests
         public async Task UpdateCocktail_WhenExisting_ReturnsConfirmMessage()
         {
             //Arrange
-            var cocktail = GetRandomCocktail();
-            var updatedCocktail = GetRandomCocktail();
-            var updatedCocktailInputModel = mapper.Map<InputCocktailModel>(updatedCocktail);
+            var cocktail = Helper.GetRandomCocktail();
+            var updatedCocktail = Helper.GetRandomCocktail();
+            var updatedInputModel = this.mapper.Map<InputCocktailModel>(updatedCocktail);
             var testController = new CocktailsController(mockedService.Object, mockedMapper.Object)
             {
                 GetUserId = () => TestUserEmail
             };
             mockedService.Setup(s => s.GetByIdAsync(cocktail.Id)).ReturnsAsync(cocktail);
-            mockedService.Setup(s => s.UpdateAsync(cocktail, updatedCocktailInputModel));
+            mockedService.Setup(s => s.UpdateAsync(cocktail, updatedCocktail));
+            mockedMapper.Setup(m => m.Map<CocktailServiceModel>(updatedInputModel)).Returns(updatedCocktail);
 
             //Act
-            var result = await testController.Update(cocktail.Id, updatedCocktailInputModel);
+            var result = await testController.Update(cocktail.Id, updatedInputModel);
 
             //Assert
             result.Should().BeOfType<OkObjectResult>();
             (result as ObjectResult).Value.Should().BeEquivalentTo(UpdatedCocktailMessage);
-            mockedService.Verify(s => s.UpdateAsync(cocktail, updatedCocktailInputModel), Times.Exactly(1));
+            mockedService.Verify(s => s.UpdateAsync(cocktail, updatedCocktail), Times.Exactly(1));
         }
 
         [Fact]
@@ -480,7 +485,7 @@ namespace MyCocktailsApi.Tests
         public async Task DeleteCocktail_WhenNotExisting_ReturnsNotFound()
         {
             //Arrange
-            var cocktail = GetRandomCocktail();
+            var cocktail = Helper.GetRandomCocktail();
             var testController = new CocktailsController(mockedService.Object, mockedMapper.Object)
             {
                 GetUserId = () => TestUserEmail
@@ -499,7 +504,7 @@ namespace MyCocktailsApi.Tests
         public async Task DeleteCocktail_WhenExisting_ReturnsConfirmMessage()
         {
             //Arrange
-            var cocktail = GetRandomCocktail();
+            var cocktail = Helper.GetRandomCocktail();
             var testController = new CocktailsController(mockedService.Object, mockedMapper.Object)
             {
                 GetUserId = () => TestUserEmail
@@ -514,98 +519,6 @@ namespace MyCocktailsApi.Tests
             result.Should().BeOfType<OkObjectResult>();
             (result as ObjectResult).Value.Should().BeEquivalentTo(DeletedCocktailMessage);
             mockedService.Verify(s => s.DeleteAsync(cocktail.Id), Times.Exactly(1));
-        }
-
-
-
-
-        private IList<OutputCocktailModel> GetGocktails(int count = 0)
-        {
-            var cocktailList = new List<OutputCocktailModel>();
-            for (int i = 0; i < count; i++)
-            {
-                var cocktail = GetRandomCocktail(i.ToString());
-                cocktailList.Add(cocktail);
-            }
-
-            return cocktailList;
-        }
-
-        private OutputCocktailModel GetRandomCocktail(string suffix = "")
-        {
-            var cocktail = new OutputCocktailModel();
-            cocktail.Id = Guid.NewGuid().ToString();
-            cocktail.Name = ($"CocktailName {suffix}").TrimEnd();
-            cocktail.Category = ($"CategoryName {suffix}").TrimEnd();
-            cocktail.Instructions = GetRandomInstructions(suffix);
-            cocktail.Likes = rand.Next(0, 10);
-            cocktail.UsersLike = GetUserLikes(cocktail.Likes);
-            cocktail.Glass = GetRandomGlassType();
-            string imageNumber = string.IsNullOrEmpty(suffix) ? "1" : suffix;
-            cocktail.PictureUrl = "https://MyRandomImages/" + imageNumber + ".jpg";
-
-            cocktail.Ingredients = GetRandomIngredients();
-            cocktail.DateModified = DateTime.UtcNow;
-
-            return cocktail;
-        }
-
-        private string GetRandomGlassType()
-        {
-            Array values = Enum.GetValues(typeof(GlassType));
-            var randomGlassType = (GlassType)values.GetValue(rand.Next(values.Length));
-
-            switch (randomGlassType)
-            {
-                case GlassType.OldFashioned:
-                    return "Old-fashioned";
-                case GlassType.CopperMug:
-                    return "Copper Mug";
-                default:
-                    return randomGlassType.ToString();
-            }
-        }
-
-        private string GetRandomInstructions(string suffix = "")
-        {
-            var sb = new StringBuilder();
-            for (int i = 0; i < 5; i++)
-            {
-                sb.Append($"Those are my instructions {i} {suffix}. ");
-            }
-
-            return sb.ToString().Trim();
-        }
-
-        private IList<OutputIngredientModel> GetRandomIngredients()
-        {
-            var ingredientsList = new List<OutputIngredientModel>();
-
-            var ingredientsCount = rand.Next(1, 5);
-
-            for (int i = 0; i < ingredientsCount; i++)
-            {
-                var ingredient = new OutputIngredientModel()
-                {
-                    Name = Guid.NewGuid().ToString(),
-                    Quantity = Guid.NewGuid().ToString()
-                };
-
-                ingredientsList.Add(ingredient);
-            }
-
-            return ingredientsList;
-        }
-
-        private IList<string> GetUserLikes(int count)
-        {
-            var userLikesCollection = new List<string>();
-            for (int i = 0; i < count; i++)
-            {
-                userLikesCollection.Add(Guid.NewGuid().ToString());
-            }
-
-            return userLikesCollection;
         }
     }
 }

@@ -7,20 +7,20 @@
 
     public interface ICocktailService
     {
-        Task<IEnumerable<OutputCocktailModel>> GetAllAsync();
+        Task<IEnumerable<CocktailServiceModel>> GetAllAsync();
 
-        Task<OutputCocktailModel> GetByIdAsync(string id);
+        Task<CocktailServiceModel> GetByIdAsync(string id);
 
-        Task<OutputCocktailModel> GetByNameAsync(string name);
+        Task<CocktailServiceModel> GetByNameAsync(string name);
 
-        Task<IEnumerable<OutputCocktailModel>> GetByCategoryAsync(string category);
+        Task<IEnumerable<CocktailServiceModel>> GetByCategoryAsync(string category);
 
-        Task<OutputCocktailModel> CreateAsync(InputCocktailServiceModel cocktail);
+        Task<CocktailServiceModel> CreateAsync(CocktailServiceModel cocktail);
 
-        Task UpdateAsync(OutputCocktailModel dbCoctail, InputCocktailModel updatedCocktail);
+        Task UpdateAsync(CocktailServiceModel dbCoctail, CocktailServiceModel updatedCocktail);
 
         Task DeleteAsync(string id);
 
-        Task UpdateLikes(OutputCocktailModel model, string userId);
+        Task UpdateLikes(CocktailServiceModel model, string userId);
     }
 }

@@ -1,14 +1,13 @@
 ﻿namespace MyCocktailsApi.Data.Models
 {
-    using MongoDB.Bson;
-    using MongoDB.Bson.Serialization.Attributes;
-    using MyCocktailsApi.Infrastructure;
-    using MyCocktailsApi.InputApiModels;
-    using Newtonsoft.Json;
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
     using System.Runtime.Serialization;
+    using MongoDB.Bson;
+    using MongoDB.Bson.Serialization.Attributes;
+    using MyCocktailsApi.Infrastructure;
+    using Newtonsoft.Json;
     using static MyCocktailsApi.Data.DataConstants.Cocktail;
 
     [BsonIgnoreExtraElements]

@@ -1,6 +1,8 @@
 ﻿namespace MyCocktailsApi.Infrastructure
 {
     using System;
+    using System.Collections;
+    using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
     using System.Text;
@@ -20,16 +22,20 @@
             this.CreateMap<InputCocktailModel, OutputCocktailModel>();
             this.CreateMap<OutputCocktailModel, InputCocktailModel>();
 
-            this.CreateMap<InputCocktailModel, InputCocktailServiceModel>();
-            this.CreateMap<InputCocktailServiceModel, Cocktail>();
-            this.CreateMap<InputCocktailServiceModel, OutputCocktailModel>();
+            this.CreateMap<InputCocktailModel, CocktailServiceModel>();
+            this.CreateMap<CocktailServiceModel, Cocktail>();
+            this.CreateMap<CocktailServiceModel, OutputCocktailModel>();
 
-            this.CreateMap<CocktailApiModel, InputCocktailServiceModel>()
+            this.CreateMap<Cocktail, CocktailServiceModel>();
+
+            this.CreateMap<CocktailApiModel, CocktailServiceModel>()
              .ForMember(c => c.Glass, cfg => cfg.MapFrom(m => m.GlassType.ToString()));
 
             this.CreateMap<Cocktail, OutputCocktailModel>()
                  .ForMember(c => c.DateModified, cfg => cfg.MapFrom(m => m.DateModified.ToLocalTime()));
             this.CreateMap<Ingredient, OutputIngredientModel>();
+            this.CreateMap<Ingredient, InputIngredientModel>();
+
             this.CreateMap<OutputCocktailModel, Cocktail>()
                 .ForMember(c => c.Glass, cfg => cfg.MapFrom(m => Enum.Parse<GlassType>(RemoveSymbols(m.Glass))))
                 .ForMember(c => c.DateModified, cfg => cfg.MapFrom(m => m.DateModified.ToUniversalTime()));

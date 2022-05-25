@@ -47,7 +47,7 @@
             }
             foreach (var apiCocktail in importedDrinksModel.Cocktails)
             {
-                var cocktail = mapper.Map<InputCocktailServiceModel>(apiCocktail);
+                var cocktail = mapper.Map<CocktailServiceModel>(apiCocktail);
                 await data.CreateAsync(cocktail);
             }
         }

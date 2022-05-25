@@ -1,19 +1,14 @@
 ﻿namespace MyCocktailsApi.Models
 {
-    using Microsoft.AspNetCore.Mvc;
-    using MongoDB.Bson;
-    using MongoDB.Bson.Serialization.Attributes;
-    using MyCocktailsApi.Infrastructure;
-    using Newtonsoft.Json;
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
-    using System.Runtime.Serialization;
+    using MyCocktailsApi.Infrastructure;
+    using Newtonsoft.Json;
     using static MyCocktailsApi.Data.DataConstants.Cocktail;
 
     public class InputCocktailModel
     {
-
         [Required]
         [StringLength(NameMaxLength, MinimumLength = NameMinLength)]
         public string Name { get; set; }
@@ -33,12 +28,11 @@
         public string PictureUrl { get; set; }
 
         [Required]
-        public IList<InputIngredientModel> Ingredients { get; init; } = new List<InputIngredientModel>();
+        public IList<InputIngredientModel> Ingredients { get; set; } = new List<InputIngredientModel>();
 
         [Required]
         [CheckDateRange]
         [DataType(DataType.DateTime)]
         public DateTime DateModified { get; set; }
-
     }
 }

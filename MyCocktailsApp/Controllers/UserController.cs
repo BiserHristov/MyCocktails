@@ -43,20 +43,7 @@
         public async Task<IActionResult> Create(User user, bool isAdmin)
         {
             var logedInUser = new ApplicationUser();
-            try
-            {
-                logedInUser = await userManager.GetUserAsync(this.User);
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, UnableCheckForUserMessage);
-            }
-
-            if (logedInUser != null)
-            {
-                ModelState.AddModelError(string.Empty, UserAlreadyLoggedMessage);
-            }
-
+           
             bool userExist = false;
 
             try
